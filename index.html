@@ -52,6 +52,8 @@ input,textarea{font:inherit;color:inherit}
 .summary .row{display:flex;justify-content:space-between;text-align:center}
 .summary .n{font-size:24px;font-weight:700;line-height:1.2}
 .summary .l{font-size:12px;opacity:.85}
+.summary .goal{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.22);font-size:13px;width:100%;color:#fff;text-align:left}
+.summary .goal b{font-size:16px}
 .summary .st{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:14px}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.22);font-size:12px;font-weight:600}
 /* parts */
@@ -111,6 +113,7 @@ input,textarea{font:inherit;color:inherit}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-width:560px;margin:0 auto;background:var(--card);border-radius:24px 24px 0 0;
   padding:10px calc(var(--sr) + 18px) calc(var(--sb) + 18px) calc(var(--sl) + 18px);max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
 .sheet.on{transform:none}
+.sheet:not(.on){visibility:hidden}
 .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
 .sh-h{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .sh-h .ic{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:var(--t);color:var(--c);flex:none}
@@ -125,7 +128,7 @@ input,textarea{font:inherit;color:inherit}
 .stp button{width:38px;height:40px;font-size:20px;color:var(--accent);font-weight:600}
 .stp input{width:52px;height:40px;border:0;background:transparent;text-align:center;font-size:17px;font-weight:700;outline:none;-moz-appearance:textfield}
 .stp input::-webkit-inner-spin-button,.stp input::-webkit-outer-spin-button,.inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.inp{height:40px;border:0;border-radius:12px;background:var(--card2);padding:0 10px;font-size:16px;font-weight:600;outline:none;width:100%;text-align:center}
+.inp{height:40px;-webkit-appearance:none;appearance:none;border:0;border-radius:12px;background:var(--card2);padding:0 10px;font-size:16px;font-weight:600;outline:none;width:100%;text-align:center}
 .inp:focus,.stp:focus-within,textarea:focus{box-shadow:0 0 0 2px var(--accent) inset}
 .sets-h,.set{display:grid;grid-template-columns:30px 1fr 96px 34px;gap:8px;align-items:center}
 .sets-h{font-size:12px;color:var(--sub);padding:4px 0}
@@ -184,6 +187,43 @@ textarea{width:100%;border:0;border-radius:12px;background:var(--card2);padding:
 .set-list .unit{display:flex;align-items:center;gap:6px;color:var(--sub)}
 .set-list .unit .inp{width:84px}
 .note{font-size:12.5px;color:var(--sub);line-height:1.6}
+.seg{display:flex;background:var(--card2);border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;padding:10px 0;border-radius:11px;font-weight:700;color:var(--sub);transition:all .15s}
+.seg button.on{background:var(--card);color:var(--accent);box-shadow:0 2px 8px rgba(30,40,90,.1)}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.kv div{background:var(--card2);border-radius:12px;padding:10px 6px;text-align:center}
+.kv b{display:block;font-size:17px}
+.kv span{font-size:11.5px;color:var(--sub)}
+.target{text-align:center;padding:4px 0 2px}
+.target .big{font-size:42px;font-weight:800;letter-spacing:.5px;line-height:1.1;background:linear-gradient(135deg,#6D7BFF,#9B5CF6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.target .big small{font-size:16px;-webkit-text-fill-color:var(--sub);color:var(--sub);font-weight:600;margin-left:4px}
+.target .rg{font-size:13px;color:var(--sub);margin-top:4px}
+.trn{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 12px;border-radius:12px;background:rgba(255,138,61,.1);color:#E8742A;font-size:13.5px;font-weight:600}
+.macro{display:flex;align-items:center;gap:16px}
+.macro .ring{position:relative;width:132px;height:132px;flex:none}
+.macro .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.macro .ring .ct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.macro .ring .ct b{font-size:22px;line-height:1.1}
+.macro .ring .ct span{font-size:11px;color:var(--sub)}
+.mlist{flex:1;min-width:0}
+.mrow{margin:6px 0 10px}
+.mrow .h{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.mrow .h .nm{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
+.mrow .h .g{font-size:18px;font-weight:800}
+.mrow .h .g small{font-size:12px;color:var(--sub);font-weight:600}
+.mrow .sub{font-size:12px;color:var(--sub)}
+.mrow .bar{height:6px;border-radius:4px;background:var(--card2);margin-top:4px;overflow:hidden}
+.mrow .bar i{display:block;height:100%;border-radius:4px}
+.tips{list-style:none;margin:0;padding:0}
+.tips li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.tips li:last-child{border-bottom:0}
+.tips .ti{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;font-size:16px}
+.tips small{display:block;color:var(--sub);font-size:12px}
+.foods{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.food{background:var(--card2);border-radius:12px;padding:8px 10px;font-size:13px;font-weight:600}
+.food small{display:block;font-weight:400;color:var(--sub);font-size:11px}
+.fh{font-size:13px;font-weight:700;margin:12px 0 6px;display:flex;align-items:center;gap:6px}
+.disc{font-size:12px;color:var(--sub);text-align:center;margin:16px 8px 4px;line-height:1.6}
 .toast{position:fixed;left:50%;bottom:calc(var(--sb) + 96px);transform:translate(-50%,20px);background:rgba(28,30,38,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 @media (min-width:480px){.parts{gap:10px}.part svg{width:40px;height:54px}}
@@ -194,6 +234,7 @@ textarea{width:100%;border:0;border-radius:12px;background:var(--card2);padding:
   <!-- 今日 -->
   <section class="view on" id="v-today"></section>
   <!-- 历史 -->
+  <section class="view" id="v-diet"></section>
   <section class="view" id="v-history"></section>
   <!-- 统计 -->
   <section class="view" id="v-stats"></section>
@@ -203,6 +244,7 @@ textarea{width:100%;border:0;border-radius:12px;background:var(--card2);padding:
 
 <nav class="tabs"><div class="in">
   <button class="tab on" data-act="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12h11"/><rect x="3" y="8" width="3.5" height="8" rx="1"/><rect x="17.5" y="8" width="3.5" height="8" rx="1"/><path d="M1.5 10.5v3M22.5 10.5v3"/></svg>今日</button>
+  <button class="tab" data-act="tab" data-tab="diet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 20h8"/><path d="M9 7c0-2 2-2 2-4M14 7c0-2 2-2 2-4"/></svg>饮食</button>
   <button class="tab" data-act="tab" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>历史</button>
   <button class="tab" data-act="tab" data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V5M16 20v-6M22 20H2"/></svg>统计</button>
   <button class="tab" data-act="tab" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/></svg>我的</button>
@@ -242,7 +284,30 @@ const EX={
   abs:[['卷腹','crunch',3.8,'r'],['平板支撑','plank',4,'h'],['仰卧举腿','legraise',3.8,'r'],['俄罗斯转体','twist',4,'r'],['健腹轮','wheel',4.5,'r']],
   cardio:[['跑步','run',8.3,'c'],['单车','bike',7,'c'],['椭圆机','elliptical',5,'c'],['跳绳','rope',11,'c'],['快走','walk',4.3,'c']]
 };
-const DEFAULT_PROFILE={weight:79,height:178,age:22};
+const DEFAULT_PROFILE={weight:79,height:178,age:22,sex:'male',activity:1.375,goal:'cut'};
+const GOALS=[['cut','减脂'],['keep','维持'],['bulk','增肌']];
+const ACTIVITY=[[1.2,'久坐','几乎不运动'],[1.375,'轻度','每周1-3次'],[1.55,'中度','每周3-5次'],[1.725,'高度','每周6-7次'],[1.9,'极高','每天两练']];
+// Mifflin-St Jeor 基础代谢
+const bmr=p=>Math.round(10*num(p.weight)+6.25*num(p.height)-5*num(p.age)+(p.sex==='female'?-161:5));
+const tdee=p=>Math.round(bmr(p)*(num(p.activity)||1.375));
+const bmiOf=p=>p.height?num(p.weight)/Math.pow(num(p.height)/100,2):0;
+const bmiLabel=b=>!b?'':b<18.5?'偏瘦':b<24?'正常':b<28?'超重':'肥胖';
+// 每日热量目标与三大营养素
+function nutrition(p){
+  const B=bmr(p),T=tdee(p),w=num(p.weight),g=GOALS.some(x=>x[0]===p.goal)?p.goal:'cut';
+  let target,lo,hi,note;
+  if(g==='cut'){lo=Math.max(B,T-500);hi=Math.max(B,T-300);target=lo;note='约每周减 0.5 kg';}
+  else if(g==='bulk'){lo=T+250;hi=T+300;target=lo;note='缓慢增肌，减少多余脂肪';}
+  else{lo=hi=target=T;note='保持当前体重';}
+  const pPer=g==='cut'?2.0:1.8;
+  const pg=Math.round(pPer*w),pk=pg*4;
+  const fg=Math.round(Math.max(target*0.25,0.6*w*9)/9),fk=fg*9;
+  const cg=Math.max(0,Math.round((target-pk-fk)/4)),ck=cg*4;
+  const pct=k=>Math.round(k/target*100);
+  return {B,T,w,g,target,lo,hi,note,pPer,
+    p:{g:pg,k:pk,pct:pct(pk)},f:{g:fg,k:fk,pct:pct(fk)},c:{g:cg,k:ck,pct:pct(ck)},
+    pRange:[Math.round(1.6*w),Math.round(2.2*w)],water:Math.round(35*w)};
+}
 
 /* ========== 自制 SVG 图标 ========== */
 const IC={
@@ -398,7 +463,8 @@ function renderToday(){
     <div class="pill" title="连续打卡天数">${UI_IC.flame}${st} 天</div></div>`;
   h+=`<div class="card summary"><div class="st"><span>今日训练</span><span class="badge">${chk?UI_IC.check.replace('<svg','<svg width="14" height="14"')+'已打卡':'未打卡'}</span></div>
     <div class="row"><div><div class="n">${ents.length}</div><div class="l">动作</div></div><div><div class="n">${daySets(d)}</div><div class="l">总组数</div></div>
-    <div><div class="n">${dayKcal(d)}</div><div class="l">消耗 kcal（估算）</div></div></div></div>`;
+    <div><div class="n">${dayKcal(d)}</div><div class="l">训练消耗 kcal（估算）</div></div></div>
+    <button class="goal" data-act="tab" data-tab="diet" id="today-goal"><span>饮食热量目标（${GOALS.find(x=>x[0]===nutrition(S.profile).g)[1]}）</span><span><b>${nutrition(S.profile).target}</b> kcal · 训练 ${dayKcal(d)} kcal ›</span></button></div>`;
   h+=`<div class="sec"><div class="sec-h"><h2>选择部位</h2><span class="hint">点一下开始记录</span></div><div class="parts">`;
   for(const p of PARTS) h+=`<button class="part${ui.part===p.id?' sel':''}" style="${cv(p)}" data-act="part" data-id="${p.id}" aria-label="${p.name}">${bodySVG(p)}<span>${p.name}</span></button>`;
   h+=`</div></div>`;
@@ -485,7 +551,13 @@ function renderMe(){
   h+=`<div class="card set-list"><div class="sec-h" style="margin:0 0 2px"><h2>个人资料</h2><span class="hint">BMI ${bmi}</span></div>
     <div class="it"><div class="lb">体重<small>用于卡路里估算</small></div><div class="unit"><input class="inp" id="pf-weight" type="number" inputmode="decimal" min="30" max="250" step="0.1" value="${p.weight}" data-pf="weight">kg</div></div>
     <div class="it"><div class="lb">身高</div><div class="unit"><input class="inp" type="number" inputmode="decimal" min="100" max="250" value="${p.height??''}" data-pf="height">cm</div></div>
-    <div class="it"><div class="lb">年龄</div><div class="unit"><input class="inp" type="number" inputmode="numeric" min="10" max="100" value="${p.age??''}" data-pf="age">岁</div></div></div>`;
+    <div class="it"><div class="lb">年龄</div><div class="unit"><input class="inp" type="number" inputmode="numeric" min="10" max="100" value="${p.age??''}" data-pf="age">岁</div></div>
+    <div class="it"><div class="lb">性别<small>用于基础代谢估算</small></div><select class="inp" style="width:110px" data-pfs="sex"><option value="male"${p.sex!=='female'?' selected':''}>男</option><option value="female"${p.sex==='female'?' selected':''}>女</option></select></div>
+    <div class="it"><div class="lb">活动水平<small>系数 ×${num(p.activity)}</small></div><select class="inp" style="width:170px" id="pf-activity" data-pfs="activity">${ACTIVITY.map(a=>`<option value="${a[0]}"${num(p.activity)===a[0]?' selected':''}>${a[1]}·${a[2]}</option>`).join('')}</select></div></div>
+  <div class="card sec"><div class="sec-h" style="margin:0 0 8px"><h2>每日能量消耗</h2><span class="hint">估算</span></div>
+    <div class="sg" style="grid-template-columns:1fr 1fr"><div class="sc" style="box-shadow:none;background:var(--card2)"><div class="n" id="bmr-v">${bmr(p)}<small>kcal</small></div><div class="l">基础代谢 BMR</div></div>
+    <div class="sc" style="box-shadow:none;background:var(--card2)"><div class="n" id="tdee-v">${tdee(p)}<small>kcal</small></div><div class="l">每日总消耗 TDEE</div></div></div>
+    <div class="note" style="margin-top:10px">BMR 采用 Mifflin-St Jeor 公式；TDEE = BMR × 活动系数（当前 ${num(p.activity)}）。训练消耗另见今日记录。</div></div>`;
   h+=`<div class="card sec set-list"><div class="sec-h" style="margin:0 0 2px"><h2>数据（备份/恢复）</h2></div>
     <div class="it"><div class="lb">导出备份<small>保存为 JSON 文件</small></div><button class="btn ghost" style="width:auto;padding:9px 16px" data-act="export">备份</button></div>
     <div class="it"><div class="lb">导入恢复<small>从 JSON 备份恢复（会覆盖当前数据）</small></div><button class="btn ghost" style="width:auto;padding:9px 16px" data-act="import">恢复</button></div>
@@ -500,7 +572,48 @@ function renderMe(){
   $('#v-me').innerHTML=h;
 }
 
-function render(){({today:renderToday,history:renderHistory,stats:renderStats,me:renderMe})[ui.tab]()}
+function renderDiet(){
+  const pr=S.profile,n=nutrition(pr),bmi=bmiOf(pr),act=ACTIVITY.find(a=>a[0]===num(pr.activity));
+  const tk=dayKcal(getDay(todayKey()));
+  const M=[['蛋白质','#FF6B6B',n.p],['脂肪','#F5A524',n.f],['碳水','#4C8DF6',n.c]];
+  const R=50,C=2*Math.PI*R;let off=0,arcs='';
+  for(const m of M){const len=m[2].k/n.target*C;arcs+=`<circle cx="66" cy="66" r="${R}" fill="none" stroke="${m[1]}" stroke-width="16" stroke-dasharray="${Math.max(0,len-2).toFixed(2)} ${(C-len+2).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;off+=len}
+  let h=`<div class="top"><div><div class="d1">饮食</div><div class="d2">每日热量与三大营养素</div></div></div>`;
+  h+=`<div class="card"><div class="sec-h" style="margin:0 0 10px"><h2>目标</h2><button class="hint" data-act="tab" data-tab="me" style="color:var(--accent);font-weight:600">修改资料</button></div>
+    <div class="seg">${GOALS.map(g=>`<button class="${n.g===g[0]?'on':''}" data-act="goal" data-g="${g[0]}">${g[1]}</button>`).join('')}</div>
+    <div class="kv"><div><b id="d-bmi">${bmi?bmi.toFixed(1):'—'}</b><span>BMI · ${bmiLabel(bmi)||'—'}</span></div><div><b id="d-bmr">${n.B}</b><span>基础代谢 kcal</span></div><div><b id="d-tdee">${n.T}</b><span>TDEE kcal</span></div></div>
+    <div class="note" style="margin-top:8px">${num(pr.height)} cm · ${num(pr.weight)} kg · ${num(pr.age)} 岁 · ${pr.sex==='female'?'女':'男'} · ${act?act[1]+' ×'+act[0]:''}　BMI 参考中国标准（≥24 超重），不区分肌肉量。</div></div>`;
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0 0 4px"><h2>每日热量目标</h2><span class="hint">估算</span></div>
+    <div class="target"><div class="big" id="d-target">${n.target}<small>kcal</small></div>
+    <div class="rg" id="d-range">${n.lo!==n.hi?`建议范围 ${n.lo}–${n.hi} kcal · `:''}${n.note}${n.g==='cut'?'（TDEE−500 至 −300，不低于基础代谢）':n.g==='bulk'?'（TDEE+250 至 +300）':'（= TDEE）'}</div></div>
+    <div class="trn"><span>今日训练消耗（估算）</span><span id="d-train">${tk} kcal</span></div></div>`;
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0 0 8px"><h2>三大营养素</h2><span class="hint">每日建议</span></div>
+    <div class="macro"><div class="ring"><svg viewBox="0 0 132 132"><circle cx="66" cy="66" r="${R}" fill="none" stroke="var(--card2)" stroke-width="16"/>${arcs}</svg><div class="ct"><b>${n.target}</b><span>kcal / 天</span></div></div>
+    <div class="mlist">${M.map((m,i)=>`<div class="mrow"><div class="h"><span class="nm"><i class="dot" style="background:${m[1]}"></i>${m[0]}</span><span class="g" id="d-m${i}">${m[2].g}<small> g</small></span></div>
+      <div class="sub">${m[2].k} kcal · ${m[2].pct}%</div><div class="bar"><i style="width:${m[2].pct}%;background:${m[1]}"></i></div></div>`).join('')}</div></div>
+    <div class="note" style="margin-top:6px">蛋白质 ${n.pPer} g/kg${n.g==='cut'?`（推荐范围 1.6–2.2 g/kg：${n.pRange[0]}–${n.pRange[1]} g）`:''}；脂肪占目标热量 25%（不低于 0.6 g/kg）；碳水 = 剩余热量。</div></div>`;
+  const tips=[['🍗','#FF6B6B','每餐都有蛋白质','分 3–4 餐摄入，每餐约 '+Math.round(n.p.g/4)+'–'+Math.round(n.p.g/3)+' g'],
+    ['🥦','#22B07D','多吃蔬菜','每天 300–500 g，增加饱腹感与膳食纤维'],
+    ['💧','#4C8DF6','喝水约 '+(n.water/1000).toFixed(1)+' L','按 35 ml/kg 估算（'+n.water+' ml），训练日适当多喝'],
+    ['😴','#9B6BF2','睡够 7–9 小时','睡眠不足会影响恢复与食欲控制'],
+    ['⚖️','#F5A524','每周称重','固定早晨空腹称；两周体重不变，再减 100–200 kcal']];
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0 0 4px"><h2>实用建议</h2></div><ul class="tips">${tips.map(t=>`<li><span class="ti" style="background:${tint(t[1],.14)}">${t[0]}</span><div><b>${t[2]}</b><small>${t[3]}</small></div></li>`).join('')}</ul></div>`;
+  const PF=[['鸡胸肉','100 g ≈ 23 g 蛋白'],['鸡蛋','1 个 ≈ 6 g'],['鱼虾','100 g ≈ 18–20 g'],['瘦牛肉','100 g ≈ 20 g'],['豆腐','北豆腐 100 g ≈ 12 g'],['牛奶 / 无糖酸奶','250 ml ≈ 8 g']];
+  const CF=[['米饭','1 碗 150 g ≈ 39 g 碳水'],['红薯','200 g ≈ 40 g'],['燕麦','40 g ≈ 24 g'],['全麦面包','2 片 ≈ 24 g'],['水果','1 个苹果 ≈ 25 g']];
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0"><h2>食物推荐</h2><span class="hint">数值约略</span></div>
+    <div class="fh"><i class="dot" style="background:#FF6B6B"></i>优质蛋白</div><div class="foods">${PF.map(f=>`<span class="food">${f[0]}<small>${f[1]}</small></span>`).join('')}</div>
+    <div class="fh"><i class="dot" style="background:#4C8DF6"></i>优质碳水</div><div class="foods">${CF.map(f=>`<span class="food">${f[0]}<small>${f[1]}</small></span>`).join('')}</div></div>`;
+  h+=`<div class="disc">⚠️ 以上为估算，不是医疗建议。如有疾病、孕期或特殊情况，请咨询医生或注册营养师。</div>`;
+  $('#v-diet').innerHTML=h;
+}
+
+function setTab(name){
+  ui.tab=name;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===name));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+name));
+  if(name==='history'){const n=new Date();ui.calY=n.getFullYear();ui.calM=n.getMonth();ui.sel=todayKey()}
+  render();scrollTo(0,0);
+}
+function render(){({today:renderToday,diet:renderDiet,history:renderHistory,stats:renderStats,me:renderMe})[ui.tab]()}
 
 /* ========== 记录面板（底部弹层）========== */
 function openSheet(html){const sh=$('#sheet');sh.innerHTML='<div class="grab"></div>'+html;sh.scrollTop=0;$('#mask').classList.add('on');sh.classList.add('on')}
@@ -631,11 +744,8 @@ document.addEventListener('click',ev=>{
   const el=ev.target.closest('[data-act]');if(!el)return;
   const a=el.dataset.act;
   switch(a){
-    case 'tab':
-      ui.tab=el.dataset.tab;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t===el));
-      document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+ui.tab));
-      if(ui.tab==='history'){const n=new Date();ui.calY=n.getFullYear();ui.calM=n.getMonth();ui.sel=todayKey()}
-      render();scrollTo(0,0);break;
+    case 'tab': ev.preventDefault();setTab(el.dataset.tab);break;
+    case 'goal': S.profile.goal=el.dataset.g;save();renderDiet();toast('目标已切换为「'+GOALS.find(x=>x[0]===el.dataset.g)[1]+'」');break;
     case 'part':
       ui.part=ui.part===el.dataset.id?null:el.dataset.id;renderToday();
       if(ui.part){const s=$('#exSec');s&&s.scrollIntoView({behavior:'smooth',block:'nearest'})}break;
@@ -691,6 +801,7 @@ document.addEventListener('change',ev=>{
     if(v<lim[0]||v>lim[1]){toast('请输入合理的数值');t.value=S.profile[f]??'';return}
     S.profile[f]=v;save();renderMe();toast('已保存');
   }
+  if(t.dataset.pfs){const f=t.dataset.pfs;S.profile[f]=f==='activity'?num(t.value):t.value;save();renderMe();toast('已保存')}
   if(t.id==='importFile'&&t.files&&t.files[0])importData(t.files[0]);
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#sheet').classList.contains('on'))closeSheet()});
