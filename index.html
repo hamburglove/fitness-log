@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>健身打卡</title>
+<meta name="description" content="简洁的健身打卡记录：部位、动作、组数次数、卡路里估算、日历与统计">
+<meta name="theme-color" content="#F5F6FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="健身打卡">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<style>
+:root{
+  --bg:#F5F6FA;--card:#FFFFFF;--card2:#F8F9FC;--text:#1C1E26;--sub:#8A8FA3;--line:#ECEEF3;
+  --body:#DCE0EA;--accent:#5B6CFF;--accent2:#8B5CF6;--ok:#22B07D;--danger:#F0506E;
+  --shadow:0 6px 20px rgba(30,40,90,.06);--r:18px;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+  --sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0F1115;--card:#1A1D24;--card2:#20242D;--text:#ECEEF3;--sub:#8B90A0;--line:#2A2E38;--body:#363B48;--shadow:0 6px 20px rgba(0,0,0,.35)}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC","Helvetica Neue",Arial,sans-serif;
+  font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+input,textarea{font:inherit;color:inherit}
+.app{max-width:560px;margin:0 auto;padding:calc(var(--st) + 14px) calc(var(--sr) + 16px) calc(var(--sb) + 92px) calc(var(--sl) + 16px)}
+.view{display:none;animation:fade .25s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:flex-end;justify-content:space-between;margin:6px 2px 16px}
+.top .d1{font-size:28px;font-weight:700;letter-spacing:.5px}
+.top .d2{color:var(--sub);font-size:14px;margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:4px;background:var(--card);box-shadow:var(--shadow);border-radius:999px;padding:7px 12px;font-weight:600;font-size:14px}
+.pill svg{width:18px;height:18px}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+.sec{margin-top:22px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin:0 2px 10px}
+.sec-h h2{font-size:17px;margin:0;font-weight:700}
+.sec-h .hint{color:var(--sub);font-size:13px}
+/* summary */
+.summary{background:linear-gradient(135deg,#6D7BFF,#9B5CF6);color:#fff;box-shadow:0 10px 26px rgba(109,123,255,.35)}
+.summary .row{display:flex;justify-content:space-between;text-align:center}
+.summary .n{font-size:24px;font-weight:700;line-height:1.2}
+.summary .l{font-size:12px;opacity:.85}
+.summary .st{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.22);font-size:12px;font-weight:600}
+/* parts */
+.parts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.part{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;border:2px solid transparent;transition:transform .12s,border-color .15s,background .15s}
+.part:active{transform:scale(.95)}
+.part svg{width:34px;height:46px}
+.part span{font-size:12px;font-weight:600;white-space:nowrap}
+.part.sel{border-color:var(--c);background:var(--t)}
+/* exercises */
+.exs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ex{position:relative;background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:transform .12s}
+.ex:active{transform:scale(.96)}
+.ex .ic{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:var(--t);color:var(--c)}
+.ex .ic svg{width:36px;height:36px}
+.ex .nm{font-size:13px;font-weight:600;line-height:1.25}
+.ex .mt{font-size:11px;color:var(--sub)}
+.ex.add{border:2px dashed var(--line);box-shadow:none;background:transparent}
+.ex.add .ic{background:var(--card2);color:var(--sub)}
+.ex .x{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--card2);color:var(--sub);font-size:14px;line-height:22px}
+/* log */
+.grp{margin-bottom:12px}
+.grp-h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin:0 2px 8px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.entry{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:12px;margin-bottom:8px}
+.entry .ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:var(--t);color:var(--c);flex:none}
+.entry .ic svg{width:30px;height:30px}
+.entry .mid{flex:1;min-width:0}
+.entry .t{font-weight:600}
+.entry .s{font-size:13px;color:var(--sub);overflow:hidden;text-overflow:ellipsis}
+.entry .nt{font-size:12px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry .kc{font-size:13px;font-weight:700;color:#FF8A3D;white-space:nowrap}
+.entry .acts{display:flex;gap:4px}
+.ib{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--card2);color:var(--sub)}
+.ib svg{width:18px;height:18px}
+.ib.del:active{color:var(--danger)}
+.empty{text-align:center;color:var(--sub);padding:26px 10px;font-size:14px}
+.empty svg{width:56px;height:56px;opacity:.5;display:block;margin:0 auto 8px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border-radius:16px;padding:15px;font-weight:700;font-size:16px;background:var(--accent);color:#fff;transition:transform .12s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn.big{padding:18px;font-size:17px;background:linear-gradient(135deg,#6D7BFF,#9B5CF6);box-shadow:0 10px 24px rgba(109,123,255,.35)}
+.btn.done{background:linear-gradient(135deg,#22B07D,#3CCB91);box-shadow:0 10px 24px rgba(34,176,125,.3)}
+.btn.ghost{background:var(--card2);color:var(--text);font-weight:600}
+.btn.danger{background:transparent;color:var(--danger);font-weight:600}
+.btn svg{width:22px;height:22px}
+.link{display:block;margin:10px auto 0;color:var(--sub);font-size:13px;text-decoration:underline}
+/* tab bar */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:6px calc(var(--sr) + 8px) calc(var(--sb) + 6px) calc(var(--sl) + 8px)}
+@supports not (background:color-mix(in srgb,red,blue)){.tabs{background:var(--card)}}
+.tabs .in{max-width:560px;margin:0 auto;display:flex}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:var(--sub);font-size:11px;font-weight:600}
+.tab svg{width:24px;height:24px}
+.tab.on{color:var(--accent)}
+/* sheet */
+.mask{position:fixed;inset:0;background:rgba(10,12,20,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.mask.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-width:560px;margin:0 auto;background:var(--card);border-radius:24px 24px 0 0;
+  padding:10px calc(var(--sr) + 18px) calc(var(--sb) + 18px) calc(var(--sl) + 18px);max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.sheet.on{transform:none}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sh-h{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sh-h .ic{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:var(--t);color:var(--c);flex:none}
+.sh-h .ic svg{width:36px;height:36px}
+.sh-h .t{font-size:19px;font-weight:700}
+.sh-h .s{font-size:13px;color:var(--sub)}
+.sh-h .close{margin-left:auto}
+.fl{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.fl .lb{font-weight:600}
+.fl .lb small{display:block;font-weight:400;color:var(--sub);font-size:12px}
+.stp{display:inline-flex;align-items:center;background:var(--card2);border-radius:12px;overflow:hidden}
+.stp button{width:38px;height:40px;font-size:20px;color:var(--accent);font-weight:600}
+.stp input{width:52px;height:40px;border:0;background:transparent;text-align:center;font-size:17px;font-weight:700;outline:none;-moz-appearance:textfield}
+.stp input::-webkit-inner-spin-button,.stp input::-webkit-outer-spin-button,.inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.inp{height:40px;border:0;border-radius:12px;background:var(--card2);padding:0 10px;font-size:16px;font-weight:600;outline:none;width:100%;text-align:center}
+.inp:focus,.stp:focus-within,textarea:focus{box-shadow:0 0 0 2px var(--accent) inset}
+.sets-h,.set{display:grid;grid-template-columns:30px 1fr 96px 34px;gap:8px;align-items:center}
+.sets-h{font-size:12px;color:var(--sub);padding:4px 0}
+.set{padding:5px 0}
+.set .idx{width:26px;height:26px;border-radius:50%;background:var(--t);color:var(--c);font-weight:700;font-size:13px;display:grid;place-items:center}
+.set .stp{width:100%;justify-content:space-between}
+.set .stp input{flex:1;min-width:0}
+.addset{width:100%;margin-top:6px;padding:11px;border-radius:12px;border:1.5px dashed var(--line);color:var(--accent);font-weight:600}
+textarea{width:100%;border:0;border-radius:12px;background:var(--card2);padding:10px 12px;font-size:16px;resize:none;outline:none;margin-top:12px}
+.est{display:flex;align-items:center;justify-content:space-between;background:rgba(255,138,61,.1);color:#E8742A;border-radius:14px;padding:12px 14px;margin:14px 0}
+.est b{font-size:20px}
+.est small{font-size:11px;opacity:.85}
+.field{margin:10px 0}
+.field label{display:block;font-size:13px;color:var(--sub);margin-bottom:6px}
+.field .inp{text-align:left}
+/* calendar */
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-h .m{font-weight:700;font-size:17px}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-g .wd{font-size:12px;color:var(--sub);padding:4px 0}
+.day{aspect-ratio:1/1.08;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:14px;font-weight:600;position:relative;border:2px solid transparent}
+.day.out{visibility:hidden}
+.day.fut{color:var(--sub);opacity:.5}
+.day.today{border-color:var(--line)}
+.day.chk{background:var(--t);color:var(--c)}
+.day.sel{border-color:var(--accent)}
+.day .dots{display:flex;gap:2px;height:6px}
+.day .dots i{width:6px;height:6px;border-radius:50%}
+.day .ck{position:absolute;top:2px;right:3px;width:12px;height:12px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:12px;color:var(--sub)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend .dot{width:8px;height:8px}
+/* stats */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sc{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px 10px;text-align:center}
+.sc .n{font-size:24px;font-weight:700;line-height:1.2}
+.sc .n small{font-size:12px;font-weight:600;color:var(--sub);margin-left:1px}
+.sc .l{font-size:12px;color:var(--sub);margin-top:2px}
+.hb{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13px}
+.hb .nm{width:52px;flex:none;font-weight:600}
+.hb .tr{flex:1;height:10px;border-radius:6px;background:var(--card2);overflow:hidden}
+.hb .tr i{display:block;height:100%;border-radius:6px}
+.hb .v{width:34px;text-align:right;color:var(--sub)}
+.vb{display:flex;align-items:flex-end;justify-content:space-between;height:130px;gap:8px;padding-top:16px}
+.vb .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.vb .c i{display:block;width:100%;max-width:28px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#FFAA6B,#FF7A3D);min-height:3px}
+.vb .c .v{font-size:10px;color:var(--sub)}
+.vb .c .d{font-size:11px;color:var(--sub)}
+.hl{display:flex;align-items:center;gap:12px}
+.hl svg{width:44px;height:58px;flex:none}
+/* settings */
+.set-list .it{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);gap:10px}
+.set-list .it:last-child{border-bottom:0}
+.set-list .it .lb{font-weight:600}
+.set-list .it .lb small{display:block;color:var(--sub);font-weight:400;font-size:12px}
+.set-list .unit{display:flex;align-items:center;gap:6px;color:var(--sub)}
+.set-list .unit .inp{width:84px}
+.note{font-size:12.5px;color:var(--sub);line-height:1.6}
+.toast{position:fixed;left:50%;bottom:calc(var(--sb) + 96px);transform:translate(-50%,20px);background:rgba(28,30,38,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (min-width:480px){.parts{gap:10px}.part svg{width:40px;height:54px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 今日 -->
+  <section class="view on" id="v-today"></section>
+  <!-- 历史 -->
+  <section class="view" id="v-history"></section>
+  <!-- 统计 -->
+  <section class="view" id="v-stats"></section>
+  <!-- 我的 -->
+  <section class="view" id="v-me"></section>
+</div>
+
+<nav class="tabs"><div class="in">
+  <button class="tab on" data-act="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12h11"/><rect x="3" y="8" width="3.5" height="8" rx="1"/><rect x="17.5" y="8" width="3.5" height="8" rx="1"/><path d="M1.5 10.5v3M22.5 10.5v3"/></svg>今日</button>
+  <button class="tab" data-act="tab" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>历史</button>
+  <button class="tab" data-act="tab" data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V5M16 20v-6M22 20H2"/></svg>统计</button>
+  <button class="tab" data-act="tab" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/></svg>我的</button>
+</div></nav>
+
+<div class="mask" id="mask" data-act="closeSheet"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+'use strict';
+/* ========== 数据定义 ========== */
+const PARTS=[
+  {id:'chest',name:'胸部',color:'#FF6B6B',view:'front',hl:['chest']},
+  {id:'sfront',name:'肩前束',color:'#F5A524',view:'front',hl:['deltF']},
+  {id:'sside',name:'肩中束',color:'#E8B400',view:'front',hl:['deltS']},
+  {id:'srear',name:'肩后束',color:'#D98324',view:'back',hl:['deltR']},
+  {id:'back',name:'背部',color:'#4C8DF6',view:'back',hl:['upperBack','lowerBack']},
+  {id:'biceps',name:'二头',color:'#9B6BF2',view:'front',hl:['uarm']},
+  {id:'triceps',name:'三头',color:'#C05CE0',view:'back',hl:['uarm']},
+  {id:'legs',name:'腿部',color:'#22B07D',view:'front',hl:['legs']},
+  {id:'abs',name:'腹部',color:'#12B5C9',view:'front',hl:['abs']},
+  {id:'cardio',name:'有氧',color:'#FF8A3D',view:'run'}
+];
+const PM=Object.fromEntries(PARTS.map(p=>[p.id,p]));
+// [名称, 图标, MET, 类型(r=次数 h=秒数 c=有氧)]
+const EX={
+  chest:[['杠铃卧推','bench',5,'r'],['哑铃卧推','dumbbell',5,'r'],['上斜卧推','incline',5,'r'],['龙门架夹胸','cable',4,'r'],['俯卧撑','pushup',3.8,'r']],
+  sfront:[['杠铃推举','press',5,'r'],['哑铃推举','dumbbell',5,'r'],['哑铃前平举','raise',3.5,'r'],['阿诺德推举','dumbbell',5,'r']],
+  sside:[['哑铃侧平举','raise',3.5,'r'],['绳索侧平举','cable',3.5,'r'],['器械侧平举','machine',3.5,'r'],['杠铃直立划船','barbell',4,'r']],
+  srear:[['俯身飞鸟','fly',3.5,'r'],['反向蝴蝶机','machine',3.5,'r'],['面拉','cable',3.5,'r'],['绳索反向飞鸟','cable',3.5,'r']],
+  back:[['引体向上','pullup',6,'r'],['高位下拉','pulldown',4.5,'r'],['杠铃划船','barbell',5,'r'],['坐姿划船','cable',4.5,'r'],['硬拉','deadlift',6,'r']],
+  biceps:[['杠铃弯举','curl',4,'r'],['哑铃弯举','dumbbell',4,'r'],['锤式弯举','dumbbell',4,'r'],['牧师凳弯举','curl',4,'r']],
+  triceps:[['绳索下压','cable',4,'r'],['仰卧臂屈伸','bench',4,'r'],['颈后臂屈伸','dumbbell',4,'r'],['窄距卧推','bench',5,'r'],['双杠臂屈伸','dip',5,'r']],
+  legs:[['杠铃深蹲','squat',6,'r'],['腿举','machine',5,'r'],['箭步蹲','lunge',5,'r'],['罗马尼亚硬拉','deadlift',5.5,'r'],['腿屈伸','machine',4,'r']],
+  abs:[['卷腹','crunch',3.8,'r'],['平板支撑','plank',4,'h'],['仰卧举腿','legraise',3.8,'r'],['俄罗斯转体','twist',4,'r'],['健腹轮','wheel',4.5,'r']],
+  cardio:[['跑步','run',8.3,'c'],['单车','bike',7,'c'],['椭圆机','elliptical',5,'c'],['跳绳','rope',11,'c'],['快走','walk',4.3,'c']]
+};
+const DEFAULT_PROFILE={weight:79,height:178,age:22};
+
+/* ========== 自制 SVG 图标 ========== */
+const IC={
+  barbell:'<path d="M14 24h20"/><rect x="9" y="15" width="5" height="18" rx="1.5"/><rect x="34" y="15" width="5" height="18" rx="1.5"/><path d="M5 20v8M43 20v8"/>',
+  dumbbell:'<g transform="rotate(-35 24 24)"><path d="M17 24h14"/><rect x="11" y="16" width="6" height="16" rx="2"/><rect x="31" y="16" width="6" height="16" rx="2"/><path d="M7 20v8M41 20v8"/></g>',
+  bench:'<path d="M8 13h32"/><rect x="10" y="8" width="4" height="10" rx="1.2"/><rect x="34" y="8" width="4" height="10" rx="1.2"/><circle cx="24" cy="24" r="3"/><path d="M10 31h28M15 31v9M33 31v9M20 13l2 8M28 13l-2 8"/>',
+  incline:'<path d="M8 10h32"/><rect x="10" y="5" width="4" height="10" rx="1.2"/><rect x="34" y="5" width="4" height="10" rx="1.2"/><path d="M14 40l3-7h9M17 33l15-11"/><path d="M26 33v7M32 22l2 18"/>',
+  cable:'<path d="M8 42V6h18"/><circle cx="28" cy="9" r="3"/><path d="M29 12l8 16"/><path d="M33 31h9"/><path d="M4 42h10"/><rect x="11" y="24" width="7" height="12" rx="1.5"/>',
+  pushup:'<circle cx="38" cy="19" r="3.5"/><path d="M34 22L10 30l-3 5"/><path d="M30 23.5v11"/><path d="M4 38h40"/>',
+  press:'<path d="M8 8h32"/><rect x="5" y="4" width="4" height="8" rx="1"/><rect x="39" y="4" width="4" height="8" rx="1"/><circle cx="24" cy="18" r="3.5"/><path d="M16 8l2 12 6 3 6-3 2-12M24 23v10M24 33l-4 10M24 33l4 10"/>',
+  raise:'<circle cx="24" cy="10" r="3.5"/><path d="M24 14v16M24 30l-4 12M24 30l4 12M9 18h30"/><rect x="4" y="15" width="5" height="6" rx="1.5"/><rect x="39" y="15" width="5" height="6" rx="1.5"/>',
+  machine:'<path d="M12 6v30h18"/><path d="M12 36v6M30 36v6M8 42h26"/><path d="M12 22h12"/><rect x="30" y="8" width="10" height="20" rx="2"/><path d="M30 14h10M30 20h10"/>',
+  fly:'<circle cx="24" cy="12" r="4"/><path d="M24 17v14M24 31l-5 10M24 31l5 10"/><path d="M8 19c5 4 10 4 16 1 6 3 11 3 16-1"/><path d="M5 16v6M43 16v6"/>',
+  pullup:'<path d="M6 7h36"/><circle cx="24" cy="15" r="3.5"/><path d="M15 7l4 13h10l4-13M24 20v12M24 32l-4 10M24 32l4 10"/>',
+  pulldown:'<path d="M24 3v7M10 10h28"/><circle cx="24" cy="19" r="3.5"/><path d="M14 10l6 13h8l6-13M24 23v10M14 39h20M24 33l-6 6M24 33l6 6"/>',
+  deadlift:'<circle cx="24" cy="7" r="3.5"/><path d="M24 11v15M24 26l-4 16M24 26l4 16M24 14l-6 12M24 14l6 12"/><path d="M8 27h32"/><rect x="5" y="21" width="4" height="12" rx="1.2"/><rect x="39" y="21" width="4" height="12" rx="1.2"/>',
+  curl:'<path d="M9 41V31c0-6 4-10 10-10h3l6-10 6 3-5 9c6 1 10 6 10 12v6z"/><path d="M22 27c2 3 6 3 8 0"/>',
+  dip:'<path d="M6 22h12M30 22h12M10 22v20M38 22v20"/><circle cx="24" cy="9" r="3.5"/><path d="M24 13v14M18 22l6-7 6 7M24 27l-3 11M24 27l3 11"/>',
+  squat:'<circle cx="24" cy="8" r="3.5"/><path d="M8 14h32M10 10v8M38 10v8"/><path d="M24 14v12M24 26l-8 5 2 11M24 26l8 5-2 11"/>',
+  lunge:'<circle cx="24" cy="7" r="3.5"/><path d="M24 11v14M24 25l9 6v11M24 25l-9 8-5 9"/><path d="M18 17l6-3 6 3"/>',
+  crunch:'<path d="M4 40h40"/><circle cx="14" cy="21" r="3.5"/><path d="M17 25l8 11"/><path d="M25 36l8-11 6 11"/><path d="M15 26l8-2"/>',
+  plank:'<circle cx="38" cy="21" r="3.5"/><path d="M34 24L8 33"/><path d="M33 25l-3 9h7"/><path d="M4 37h40"/>',
+  legraise:'<path d="M4 40h40"/><circle cx="8" cy="34" r="3.5"/><path d="M12 35h16l8-22"/><path d="M14 38h8"/>',
+  twist:'<path d="M4 40h40"/><circle cx="17" cy="11" r="3.5"/><path d="M18 15l5 21 13-7"/><circle cx="33" cy="19" r="4"/><path d="M20 22l9-2"/>',
+  wheel:'<circle cx="24" cy="30" r="9"/><circle cx="24" cy="30" r="2.5"/><path d="M9 30h30"/><path d="M14 30v-4M34 30v-4"/>',
+  run:'<circle cx="29" cy="7" r="3.5"/><path d="M27 13l-4 13M26 15l7 4 4-4M26 15l-7 4-4 5M23 26l7 6-2 10M23 26l-6 7h-7"/>',
+  walk:'<circle cx="25" cy="7" r="3.5"/><path d="M24 12l-2 14 5 6v10M22 26l-5 8-1 8M23 15l-5 9M24 15l6 7"/>',
+  bike:'<circle cx="12" cy="32" r="8"/><circle cx="36" cy="32" r="8"/><path d="M12 32l8-14h12l4 14M20 18l6 14H12M26 32l6-14M17 14h6M30 13l2 5"/>',
+  elliptical:'<path d="M8 42h32"/><ellipse cx="24" cy="35" rx="13" ry="4"/><path d="M33 35L30 8M30 8h-4M15 35l5-18"/>',
+  rope:'<circle cx="24" cy="13" r="3.5"/><path d="M24 17v12M24 29l-4 8M24 29l4 8M24 20l-7 6M24 20l7 6"/><path d="M17 26C4 30 6 46 24 44s20-14 7-18"/>',
+  custom:'<path d="M24 6l5.3 11 12 1.6-8.8 8.3 2.2 12L24 33l-10.7 5.9 2.2-12L6.7 18.6l12-1.6z"/>',
+  plus:'<path d="M24 12v24M12 24h24"/>'
+};
+const ico=(k,sw)=>`<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="${sw||2.6}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]||IC.custom}</svg>`;
+const UI_IC={
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+  del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  flame:'<svg viewBox="0 0 24 24"><path fill="#FF7A3D" d="M12 2c1 3.5-1.5 5-1.5 7.5 0 1.2.8 2 1.8 2 1.3 0 2-1 1.7-2.7C16.7 10.5 19 13 19 16a7 7 0 0 1-14 0c0-3.7 2.6-6 4.2-8.2C10.7 5.8 11.6 4.2 12 2z"/></svg>',
+  left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>'
+};
+/* 人体部位示意图（正面/背面），高亮所选部位 */
+function bodySVG(p){
+  if(p.view==='run') return `<svg viewBox="0 0 60 84" aria-hidden="true"><circle cx="30" cy="84" r="0" /><g fill="none" stroke="${p.color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M33 22l-6 22M31 25l10 6 6-5M31 25l-10 5-6 7M27 44l10 9-3 16M27 44l-9 11H8"/></g><circle cx="36" cy="12" r="6.5" fill="${p.color}"/><path d="M6 76h48" stroke="var(--body)" stroke-width="3" stroke-linecap="round"/></svg>`;
+  const hl=new Set(p.hl||[]),c=k=>hl.has(k)?p.color:'var(--body)';
+  const back=p.view==='back';
+  let s=`<svg viewBox="0 0 60 84" aria-hidden="true">`;
+  s+=`<circle cx="30" cy="9" r="6.5" fill="var(--body)"/><rect x="27" y="14.5" width="6" height="5" rx="2" fill="var(--body)"/>`;
+  if(back){
+    s+=`<rect x="21" y="19" width="18" height="12.5" rx="3.5" fill="${c('upperBack')}"/><rect x="23" y="32.3" width="14" height="13" rx="3.2" fill="${c('lowerBack')}"/>`;
+    s+=`<ellipse cx="26.2" cy="50" rx="4.4" ry="4.2" fill="var(--body)"/><ellipse cx="33.8" cy="50" rx="4.4" ry="4.2" fill="var(--body)"/>`;
+    s+=`<ellipse cx="17.3" cy="22.8" rx="4.8" ry="4.3" fill="${c('deltR')}"/><ellipse cx="42.7" cy="22.8" rx="4.8" ry="4.3" fill="${c('deltR')}"/>`;
+  }else{
+    s+=`<rect x="21" y="19" width="8.6" height="10.5" rx="3.2" fill="${c('chest')}"/><rect x="30.4" y="19" width="8.6" height="10.5" rx="3.2" fill="${c('chest')}"/>`;
+    s+=`<rect x="22.5" y="30.5" width="15" height="14.5" rx="3.5" fill="${c('abs')}"/>`;
+    if(hl.has('abs')) s+=`<path d="M30 32v11.5M23.5 35.5h13M23.5 40h13" stroke="rgba(255,255,255,.55)" stroke-width="1"/>`;
+    s+=`<rect x="22" y="45.8" width="16" height="7" rx="3" fill="var(--body)"/>`;
+    s+=`<ellipse cx="15.6" cy="23.4" rx="3.1" ry="4.1" fill="${c('deltS')}"/><ellipse cx="44.4" cy="23.4" rx="3.1" ry="4.1" fill="${c('deltS')}"/>`;
+    s+=`<ellipse cx="19.4" cy="22.3" rx="3.2" ry="4.2" fill="${c('deltF')}"/><ellipse cx="40.6" cy="22.3" rx="3.2" ry="4.2" fill="${c('deltF')}"/>`;
+  }
+  s+=`<rect x="11.6" y="27" width="6" height="14" rx="3" fill="${c('uarm')}"/><rect x="42.4" y="27" width="6" height="14" rx="3" fill="${c('uarm')}"/>`;
+  s+=`<rect x="10.8" y="42" width="5.5" height="12.5" rx="2.75" fill="var(--body)"/><rect x="43.7" y="42" width="5.5" height="12.5" rx="2.75" fill="var(--body)"/>`;
+  const lg=c('legs');
+  s+=`<rect x="21.5" y="53.5" width="7.8" height="16" rx="3.6" fill="${lg}"/><rect x="30.7" y="53.5" width="7.8" height="16" rx="3.6" fill="${lg}"/><rect x="22.2" y="70.5" width="6.6" height="12.5" rx="3.2" fill="${lg}"/><rect x="31.2" y="70.5" width="6.6" height="12.5" rx="3.2" fill="${lg}"/>`;
+  return s+'</svg>';
+}
+
+/* ========== 工具函数 ========== */
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,'0');
+const dkey=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const pkey=k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
+const todayKey=()=>dkey(new Date());
+const WD=['日','一','二','三','四','五','六'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tint=(hex,a)=>hex+Math.round(a*255).toString(16).padStart(2,'0');
+const cv=p=>`--c:${p.color};--t:${tint(p.color,.13)}`;
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* ========== 存储 ========== */
+const KEY='fitlog.v1';
+let S;
+function normalize(o){
+  o=o&&typeof o==='object'?o:{};
+  const pr=Object.assign({},DEFAULT_PROFILE,o.profile||{});
+  pr.weight=num(pr.weight)||DEFAULT_PROFILE.weight;
+  return {v:1,profile:pr,custom:o.custom&&typeof o.custom==='object'?o.custom:{},days:o.days&&typeof o.days==='object'?o.days:{}};
+}
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');return normalize(o)}catch(e){return normalize(null)}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('保存失败：浏览器存储不可用')}}
+S=load();
+const getDay=(k,create)=>{if(!S.days[k]&&create)S.days[k]={entries:[],checked:false};return S.days[k]};
+const isChecked=k=>!!(S.days[k]&&S.days[k].checked);
+const exList=part=>[...EX[part].map(e=>({n:e[0],i:e[1],m:e[2],t:e[3]})),...(S.custom[part]||[]).map(e=>({...e,custom:1}))];
+
+/* ========== 卡路里估算（MET）========== */
+function hours(e){
+  if(e.t==='c') return num(e.minutes)/60;
+  let sec=0;
+  for(const s of e.sets||[]){const r=num(s.r);if(r>0) sec+= e.t==='h'? r+60 : r*3+60;}
+  return sec/3600;
+}
+const kcal=e=>Math.round(num(e.m)*(num(e.bw)||S.profile.weight)*hours(e));
+const dayKcal=d=>d?d.entries.reduce((a,e)=>a+kcal(e),0):0;
+const daySets=d=>d?d.entries.reduce((a,e)=>a+(e.t==='c'?0:(e.sets||[]).length),0):0;
+const dayParts=d=>d?PARTS.filter(p=>d.entries.some(e=>e.part===p.id)):[];
+
+function summary(e){
+  if(e.t==='c'){let s=`${num(e.minutes)} 分钟`;if(num(e.km)>0)s+=` · ${num(e.km)} km`;return s}
+  const sets=e.sets||[],n=sets.length,unit=e.t==='h'?'秒':'次';
+  const rs=sets.map(s=>num(s.r)),ws=sets.map(s=>s.w===''||s.w==null?null:num(s.w));
+  let s=rs.every(r=>r===rs[0])?`${n} 组 × ${rs[0]} ${unit}`:`${n} 组 · ${rs.join('/')} ${unit}`;
+  const wv=ws.filter(w=>w!=null&&w>0);
+  if(wv.length){s+= wv.length===n&&wv.every(w=>w===wv[0])?` · ${wv[0]} kg`:` · 最大 ${Math.max(...wv)} kg`}
+  return s;
+}
+
+/* ========== 状态 ========== */
+const now=new Date();
+const ui={tab:'today',part:null,calY:now.getFullYear(),calM:now.getMonth(),sel:todayKey()};
+let draft=null,sheetMode=null;
+
+/* ========== 统计 ========== */
+function streak(){
+  const d=new Date();d.setHours(0,0,0,0);
+  if(!isChecked(dkey(d)))d.setDate(d.getDate()-1);
+  let n=0;while(isChecked(dkey(d))){n++;d.setDate(d.getDate()-1)}
+  return n;
+}
+function longest(){
+  const ks=Object.keys(S.days).filter(isChecked).sort();let best=0,cur=0,prev=null;
+  for(const k of ks){const t=pkey(k).getTime();cur=prev!=null&&Math.round((t-prev)/864e5)===1?cur+1:1;best=Math.max(best,cur);prev=t}
+  return best;
+}
+function rangeKeys(from,to){const out=[];const d=new Date(from);while(d<=to){out.push(dkey(d));d.setDate(d.getDate()+1)}return out}
+function weekKeys(){const d=new Date();d.setHours(0,0,0,0);const off=(d.getDay()+6)%7;const s=new Date(d);s.setDate(d.getDate()-off);const e=new Date(s);e.setDate(s.getDate()+6);return rangeKeys(s,e)}
+function lastNKeys(n){const e=new Date();e.setHours(0,0,0,0);const s=new Date(e);s.setDate(e.getDate()-n+1);return rangeKeys(s,e)}
+function partCounts(keys){
+  const c={};PARTS.forEach(p=>c[p.id]=0);
+  for(const k of keys){const d=S.days[k];if(!d)continue;for(const p of dayParts(d))c[p.id]++}
+  return c;
+}
+function topPart(keys){const c=partCounts(keys);let best=null;for(const p of PARTS){if(c[p.id]>0&&(!best||c[p.id]>c[best.id]))best=p}return best}
+
+/* ========== 渲染：今日 ========== */
+function renderToday(){
+  const k=todayKey(),d=getDay(k),dt=new Date();
+  const ents=d?d.entries:[],chk=isChecked(k),st=streak();
+  let h=`<div class="top"><div><div class="d1">${dt.getMonth()+1}月${dt.getDate()}日</div><div class="d2">星期${WD[dt.getDay()]} · ${dt.getFullYear()}年</div></div>
+    <div class="pill" title="连续打卡天数">${UI_IC.flame}${st} 天</div></div>`;
+  h+=`<div class="card summary"><div class="st"><span>今日训练</span><span class="badge">${chk?UI_IC.check.replace('<svg','<svg width="14" height="14"')+'已打卡':'未打卡'}</span></div>
+    <div class="row"><div><div class="n">${ents.length}</div><div class="l">动作</div></div><div><div class="n">${daySets(d)}</div><div class="l">总组数</div></div>
+    <div><div class="n">${dayKcal(d)}</div><div class="l">消耗 kcal（估算）</div></div></div></div>`;
+  h+=`<div class="sec"><div class="sec-h"><h2>选择部位</h2><span class="hint">点一下开始记录</span></div><div class="parts">`;
+  for(const p of PARTS) h+=`<button class="part${ui.part===p.id?' sel':''}" style="${cv(p)}" data-act="part" data-id="${p.id}" aria-label="${p.name}">${bodySVG(p)}<span>${p.name}</span></button>`;
+  h+=`</div></div>`;
+  if(ui.part){
+    const p=PM[ui.part];
+    h+=`<div class="sec" id="exSec"><div class="sec-h"><h2>选择动作 · ${p.name}</h2><span class="hint">${p.id==='cardio'?'记录时长/距离':'记录组数/次数'}</span></div><div class="exs">`;
+    exList(p.id).forEach((e,i)=>{
+      h+=`<button class="ex" style="${cv(p)}" data-act="ex" data-i="${i}">${e.custom?`<span class="x" data-act="delCustom" data-n="${esc(e.n)}" aria-label="删除自定义动作">×</span>`:''}<div class="ic">${ico(e.i)}</div><div class="nm">${esc(e.n)}</div><div class="mt">${e.custom?'自定义':e.t==='c'?'有氧':e.t==='h'?'计时':'力量'}</div></button>`;
+    });
+    h+=`<button class="ex add" data-act="addCustom"><div class="ic">${ico('plus')}</div><div class="nm">自定义动作</div><div class="mt">保存可复用</div></button></div></div>`;
+  }
+  h+=`<div class="sec"><div class="sec-h"><h2>今日记录</h2>${ents.length?`<span class="hint">共 ${ents.length} 个动作</span>`:''}</div>${entriesHTML(ents,true)}</div>`;
+  h+=`<div class="sec">`;
+  if(chk) h+=`<button class="btn big done" data-act="checkin">${UI_IC.check} 今日已打卡 · 继续保持</button><button class="link" data-act="uncheck">撤销打卡</button>`;
+  else h+=`<button class="btn big" data-act="checkin">${UI_IC.check} 完成今日训练 · 打卡</button>`;
+  h+=`</div>`;
+  $('#v-today').innerHTML=h;
+}
+function entriesHTML(ents,editable){
+  if(!ents.length) return `<div class="card empty">${ico('dumbbell',2)}${editable?'还没有记录，先选一个部位和动作吧':'这天没有训练记录'}</div>`;
+  let h='';
+  for(const p of PARTS){
+    const list=ents.filter(e=>e.part===p.id);if(!list.length)continue;
+    h+=`<div class="grp"><div class="grp-h"><span class="dot" style="background:${p.color}"></span>${p.name}<span class="hint" style="color:var(--sub);font-weight:400;font-size:12px">${list.reduce((a,e)=>a+kcal(e),0)} kcal</span></div>`;
+    for(const e of list){
+      h+=`<div class="entry" style="${cv(p)}"><div class="ic">${ico(e.i)}</div><div class="mid"><div class="t">${esc(e.name)}</div><div class="s">${summary(e)}</div>${e.note?`<div class="nt">📝 ${esc(e.note)}</div>`:''}</div>
+        <div class="kc">${kcal(e)} kcal</div>${editable?`<div class="acts"><button class="ib" data-act="editEntry" data-id="${e.id}" aria-label="编辑">${UI_IC.edit}</button><button class="ib del" data-act="delEntry" data-id="${e.id}" aria-label="删除">${UI_IC.del}</button></div>`:''}</div>`;
+    }
+    h+=`</div>`;
+  }
+  return h;
+}
+
+/* ========== 渲染：历史 ========== */
+function renderHistory(){
+  const y=ui.calY,m=ui.calM,first=new Date(y,m,1),off=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate(),tk=todayKey();
+  const top=topPart(lastNKeys(30)),wk=weekKeys().filter(isChecked).length;
+  let h=`<div class="top"><div><div class="d1">训练日历</div><div class="d2">点日期查看当天详情</div></div><div class="pill">${UI_IC.flame}${streak()} 天</div></div>`;
+  h+=`<div class="sg"><div class="sc"><div class="n">${streak()}<small>天</small></div><div class="l">连续打卡</div></div><div class="sc"><div class="n">${wk}<small>次</small></div><div class="l">本周训练</div></div><div class="sc"><div class="n" style="font-size:18px;line-height:1.55;color:${top?top.color:'var(--sub)'}">${top?top.name:'—'}</div><div class="l">最常练部位</div></div></div>`;
+  h+=`<div class="card sec"><div class="cal-h"><button class="ib" data-act="calPrev" aria-label="上个月">${UI_IC.left}</button><div class="m">${y}年${m+1}月</div><button class="ib" data-act="calNext" aria-label="下个月">${UI_IC.right}</button></div><div class="cal-g">`;
+  for(const w of ['一','二','三','四','五','六','日']) h+=`<div class="wd">${w}</div>`;
+  for(let i=0;i<off;i++) h+=`<div class="day out"></div>`;
+  for(let dd=1;dd<=days;dd++){
+    const k=`${y}-${pad(m+1)}-${pad(dd)}`,d=S.days[k],ps=dayParts(d),chk=isChecked(k);
+    const cls=['day'];if(chk)cls.push('chk');if(k===tk)cls.push('today');if(k===ui.sel)cls.push('sel');if(k>tk)cls.push('fut');
+    const sty=chk&&ps.length?cv(ps[0]):chk?'--c:var(--ok);--t:rgba(34,176,125,.14)':'';
+    h+=`<button class="${cls.join(' ')}" style="${sty}" data-act="pickDay" data-k="${k}">${dd}<span class="dots">${ps.slice(0,4).map(p=>`<i style="background:${p.color}"></i>`).join('')}</span></button>`;
+  }
+  h+=`</div><div class="legend">${PARTS.map(p=>`<span><i class="dot" style="background:${p.color}"></i>${p.name}</span>`).join('')}</div></div>`;
+  const sd=S.days[ui.sel],sdt=pkey(ui.sel);
+  h+=`<div class="sec"><div class="sec-h"><h2>${sdt.getMonth()+1}月${sdt.getDate()}日 星期${WD[sdt.getDay()]}</h2><span class="hint">${isChecked(ui.sel)?'✅ 已打卡':'未打卡'} · ${dayKcal(sd)} kcal</span></div>${entriesHTML(sd?sd.entries:[],false)}</div>`;
+  $('#v-history').innerHTML=h;
+}
+
+/* ========== 渲染：统计 ========== */
+function renderStats(){
+  const all=Object.keys(S.days),checked=all.filter(isChecked);
+  const mk=`${new Date().getFullYear()}-${pad(new Date().getMonth()+1)}`;
+  const totalK=all.reduce((a,k)=>a+dayKcal(S.days[k]),0);
+  let h=`<div class="top"><div><div class="d1">训练统计</div><div class="d2">坚持就是胜利</div></div></div>`;
+  h+=`<div class="sg">
+    <div class="sc"><div class="n">${streak()}<small>天</small></div><div class="l">连续打卡</div></div>
+    <div class="sc"><div class="n">${longest()}<small>天</small></div><div class="l">最长连续</div></div>
+    <div class="sc"><div class="n">${checked.length}<small>天</small></div><div class="l">累计打卡</div></div>
+    <div class="sc"><div class="n">${weekKeys().filter(isChecked).length}<small>次</small></div><div class="l">本周训练</div></div>
+    <div class="sc"><div class="n">${checked.filter(k=>k.startsWith(mk)).length}<small>次</small></div><div class="l">本月训练</div></div>
+    <div class="sc"><div class="n">${totalK>=10000?(totalK/1000).toFixed(1)+'<small>k</small>':totalK}<small>kcal</small></div><div class="l">累计消耗(估)</div></div></div>`;
+  const k30=lastNKeys(30),pc=partCounts(k30),top=topPart(k30),mx=Math.max(1,...Object.values(pc));
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0 0 6px"><h2>近 30 天部位分布</h2><span class="hint">按训练天数</span></div>`;
+  if(top) h+=`<div class="hl" style="margin:6px 0 8px">${bodySVG(top)}<div><div style="font-size:13px;color:var(--sub)">最常练部位</div><div style="font-size:20px;font-weight:700;color:${top.color}">${top.name}</div><div style="font-size:13px;color:var(--sub)">练了 ${pc[top.id]} 天</div></div></div>`;
+  for(const p of PARTS) h+=`<div class="hb"><span class="nm">${p.name}</span><span class="tr"><i style="width:${pc[p.id]/mx*100}%;background:${p.color}"></i></span><span class="v">${pc[p.id]} 天</span></div>`;
+  h+=`</div>`;
+  const k7=lastNKeys(7),kv=k7.map(k=>dayKcal(S.days[k])),m7=Math.max(1,...kv);
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0"><h2>近 7 天消耗</h2><span class="hint">kcal · 估算</span></div><div class="vb">`;
+  k7.forEach((k,i)=>{const d=pkey(k);h+=`<div class="c"><span class="v">${kv[i]||''}</span><i style="height:${kv[i]/m7*85}%"></i><span class="d">${k===todayKey()?'今':WD[d.getDay()]}</span></div>`});
+  h+=`</div></div>`;
+  $('#v-stats').innerHTML=h;
+}
+
+/* ========== 渲染：我的 ========== */
+function renderMe(){
+  const p=S.profile,bmi=p.height?(p.weight/Math.pow(p.height/100,2)).toFixed(1):'—';
+  let h=`<div class="top"><div><div class="d1">我的</div><div class="d2">个人资料与数据备份</div></div></div>`;
+  h+=`<div class="card set-list"><div class="sec-h" style="margin:0 0 2px"><h2>个人资料</h2><span class="hint">BMI ${bmi}</span></div>
+    <div class="it"><div class="lb">体重<small>用于卡路里估算</small></div><div class="unit"><input class="inp" id="pf-weight" type="number" inputmode="decimal" min="30" max="250" step="0.1" value="${p.weight}" data-pf="weight">kg</div></div>
+    <div class="it"><div class="lb">身高</div><div class="unit"><input class="inp" type="number" inputmode="decimal" min="100" max="250" value="${p.height??''}" data-pf="height">cm</div></div>
+    <div class="it"><div class="lb">年龄</div><div class="unit"><input class="inp" type="number" inputmode="numeric" min="10" max="100" value="${p.age??''}" data-pf="age">岁</div></div></div>`;
+  h+=`<div class="card sec set-list"><div class="sec-h" style="margin:0 0 2px"><h2>数据（备份/恢复）</h2></div>
+    <div class="it"><div class="lb">导出备份<small>保存为 JSON 文件</small></div><button class="btn ghost" style="width:auto;padding:9px 16px" data-act="export">备份</button></div>
+    <div class="it"><div class="lb">导入恢复<small>从 JSON 备份恢复（会覆盖当前数据）</small></div><button class="btn ghost" style="width:auto;padding:9px 16px" data-act="import">恢复</button></div>
+    <div class="it"><div class="lb">清空所有数据<small>不可撤销，建议先备份</small></div><button class="btn danger" style="width:auto;padding:9px 6px" data-act="clear">清空</button></div></div>`;
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0 0 6px"><h2>关于卡路里估算</h2></div><div class="note">
+    消耗为<b>估算值</b>，公式：kcal = MET × 体重(kg) × 时长(小时)。<br>
+    力量训练时长按 每组(次数 × 3 秒 + 休息 60 秒) 累加；计时动作按 每组(秒数 + 60 秒)；有氧按填写的分钟数。<br>
+    不同动作采用不同 MET（力量约 3.5–6，有氧按项目，如跑步 8.3、跳绳 11）。实际消耗因强度、个人体质差异较大，仅供参考。</div></div>`;
+  h+=`<div class="card sec"><div class="sec-h" style="margin:0 0 6px"><h2>添加到手机桌面</h2></div><div class="note">
+    iPhone：用 Safari 打开本页 → 点底部「分享」按钮 → 选择「添加到主屏幕」，即可像 App 一样全屏使用，离线可用。<br>
+    安卓：用 Chrome 打开 → 菜单 →「添加到主屏幕 / 安装应用」。<br>数据保存在本机浏览器中，请定期备份。</div></div>`;
+  $('#v-me').innerHTML=h;
+}
+
+function render(){({today:renderToday,history:renderHistory,stats:renderStats,me:renderMe})[ui.tab]()}
+
+/* ========== 记录面板（底部弹层）========== */
+function openSheet(html){const sh=$('#sheet');sh.innerHTML='<div class="grab"></div>'+html;sh.scrollTop=0;$('#mask').classList.add('on');sh.classList.add('on')}
+function closeSheet(){$('#mask').classList.remove('on');$('#sheet').classList.remove('on');draft=null;sheetMode=null}
+
+function openEditor(part,ex,entry){
+  sheetMode='entry';
+  if(entry) draft=JSON.parse(JSON.stringify(entry));
+  else{
+    // 预填：沿用该动作上一次的记录
+    const last=findLast(part,ex.n);
+    draft={id:null,part,name:ex.n,i:ex.i,m:ex.m,t:ex.t,sets:last&&last.sets?JSON.parse(JSON.stringify(last.sets)):ex.t==='h'?[{r:30,w:''},{r:30,w:''},{r:30,w:''}]:[{r:12,w:''},{r:12,w:''},{r:12,w:''}],
+      minutes:last?last.minutes:30,km:last?last.km:'',note:''};
+  }
+  renderEditor();
+}
+function findLast(part,name){
+  const ks=Object.keys(S.days).sort().reverse();
+  for(const k of ks){const e=S.days[k].entries.find(x=>x.part===part&&x.name===name);if(e)return e}
+  return null;
+}
+function renderEditor(){
+  const p=PM[draft.part],d=draft;
+  let h=`<div class="sh-h" style="${cv(p)}"><div class="ic">${ico(d.i)}</div><div><div class="t">${esc(d.name)}</div><div class="s">${p.name} · MET ${d.m}</div></div><button class="ib close" data-act="closeSheet" aria-label="关闭">${UI_IC.close}</button></div>`;
+  if(d.t==='c'){
+    h+=`<div class="fl"><div class="lb">时长<small>分钟</small></div><div class="stp"><button data-act="stepMin" data-d="-5">−</button><input id="ed-min" type="number" inputmode="numeric" min="0" value="${num(d.minutes)}"><button data-act="stepMin" data-d="5">+</button></div></div>
+      <div class="fl"><div class="lb">距离<small>km，可选</small></div><input class="inp" id="ed-km" type="number" inputmode="decimal" step="0.1" min="0" style="width:132px" placeholder="—" value="${d.km??''}"></div>`;
+  }else{
+    h+=`<div class="fl"><div class="lb">组数</div><div class="stp"><button data-act="setCount" data-d="-1">−</button><input id="ed-count" type="number" readonly value="${d.sets.length}"><button data-act="setCount" data-d="1">+</button></div></div>
+      <div class="sets-h"><span>组</span><span style="text-align:center">${d.t==='h'?'每组秒数':'每组次数'}</span><span style="text-align:center">重量 kg（可选）</span><span></span></div><div id="ed-sets">${setsHTML()}</div>
+      <button class="addset" data-act="addSet">+ 添加一组</button>`;
+  }
+  h+=`<textarea id="ed-note" rows="2" maxlength="200" placeholder="备注（可选），如：状态不错，下次加重">${esc(d.note||'')}</textarea>`;
+  h+=`<div class="est" id="ed-est"></div>`;
+  h+=`<button class="btn" style="background:${p.color}" data-act="saveEntry">${d.id?'保存修改':'加入今日记录'}</button>`;
+  openSheet(h);updEst();
+}
+function setsHTML(){
+  const p=PM[draft.part];
+  return draft.sets.map((s,i)=>`<div class="set" style="${cv(p)}"><span class="idx">${i+1}</span>
+    <div class="stp"><button data-act="stepRep" data-i="${i}" data-d="${draft.t==='h'?-5:-1}">−</button><input type="number" inputmode="numeric" min="0" data-rep="${i}" value="${s.r}"><button data-act="stepRep" data-i="${i}" data-d="${draft.t==='h'?5:1}">+</button></div>
+    <input class="inp" type="number" inputmode="decimal" step="0.5" min="0" placeholder="—" data-w="${i}" value="${s.w??''}">
+    <button class="ib del" data-act="rmSet" data-i="${i}" aria-label="删除这一组">${UI_IC.del}</button></div>`).join('');
+}
+function refreshSets(){$('#ed-sets').innerHTML=setsHTML();$('#ed-count').value=draft.sets.length;updEst()}
+function updEst(){
+  const el=$('#ed-est');if(!el||!draft)return;
+  const k=kcal({...draft,bw:draft.bw||S.profile.weight});
+  el.innerHTML=`<span>预计消耗<br><small>估算 · 体重 ${draft.bw||S.profile.weight} kg</small></span><span><b>${k}</b> kcal</span>`;
+}
+function saveEntry(){
+  const d=draft;
+  if(d.t==='c'){if(num(d.minutes)<=0)return toast('请填写有氧时长');d.km=num(d.km)>0?num(d.km):''}
+  else{
+    d.sets=d.sets.filter(s=>num(s.r)>0).map(s=>({r:num(s.r),w:s.w===''||s.w==null||num(s.w)<=0?'':num(s.w)}));
+    if(!d.sets.length){toast(d.t==='h'?'请至少填写一组秒数':'请至少填写一组次数');return}
+  }
+  d.note=(d.note||'').trim();
+  const day=getDay(todayKey(),true);
+  if(d.id){
+    // 编辑：在其所在日期中查找
+    for(const k in S.days){const i=S.days[k].entries.findIndex(e=>e.id===d.id);if(i>=0){S.days[k].entries[i]=d;break}}
+    toast('已保存修改');
+  }else{
+    d.id=uid();d.bw=S.profile.weight;d.ts=Date.now();day.entries.push(d);
+    toast(`已添加：${d.name}`);
+  }
+  save();closeSheet();render();
+}
+
+function openCustom(){
+  sheetMode='custom';const p=PM[ui.part];
+  openSheet(`<div class="sh-h" style="${cv(p)}"><div class="ic">${ico('custom')}</div><div><div class="t">添加自定义动作</div><div class="s">${p.name} · 保存后可重复使用</div></div><button class="ib close" data-act="closeSheet" aria-label="关闭">${UI_IC.close}</button></div>
+    <div class="field"><label>动作名称</label><input class="inp" id="cu-name" maxlength="20" placeholder="${p.id==='cardio'?'例如：登山机':'例如：史密斯机卧推'}"></div>
+    ${p.id==='cardio'?'':`<div class="field"><label>记录方式</label><div style="display:flex;gap:8px"><button class="btn ghost" data-act="cuType" data-t="r" id="cu-r" style="box-shadow:0 0 0 2px var(--accent) inset">按次数</button><button class="btn ghost" data-act="cuType" data-t="h" id="cu-h">按秒数（计时）</button></div></div>`}
+    <button class="btn" style="background:${p.color};margin-top:16px" data-act="saveCustom">保存动作</button>`);
+  draft={t:p.id==='cardio'?'c':'r'};
+  setTimeout(()=>{const i=$('#cu-name');i&&i.focus()},300);
+}
+function saveCustom(){
+  const n=($('#cu-name').value||'').trim();if(!n)return toast('请输入动作名称');
+  const part=ui.part;
+  if(exList(part).some(e=>e.n===n))return toast('该动作已存在');
+  const t=draft.t;(S.custom[part]=S.custom[part]||[]).push({n,i:'custom',m:t==='c'?7:4.5,t});
+  save();closeSheet();render();toast(`已添加自定义动作：${n}`);
+}
+
+/* ========== 打卡 ========== */
+function checkin(){
+  const k=todayKey(),d=getDay(k);
+  if(isChecked(k))return toast('今天已经打过卡啦 💪');
+  if(!d||!d.entries.length)return toast('先添加至少一个动作再打卡');
+  d.checked=true;d.checkedAt=Date.now();save();render();
+  toast(`打卡成功！已连续 ${streak()} 天 🎉`);
+}
+
+/* ========== 备份/恢复 ========== */
+async function exportData(){
+  const data=JSON.stringify({app:'fitness-log',version:1,exportedAt:new Date().toISOString(),...S},null,2);
+  const name=`健身打卡备份-${todayKey()}.json`,blob=new Blob([data],{type:'application/json'});
+  try{
+    if(matchMedia('(pointer:coarse)').matches&&navigator.canShare){
+      const f=new File([blob],name,{type:'application/json'});
+      if(navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'健身打卡备份'});return}
+    }
+  }catch(e){if(e&&e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('备份文件已导出');
+}
+function importData(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const o=JSON.parse(r.result);
+      if(!o||typeof o!=='object'||typeof o.days!=='object')throw new Error('bad');
+      if(!confirm('导入将覆盖当前所有数据，确定恢复吗？'))return;
+      S=normalize(o);save();render();toast('数据已恢复');
+    }catch(e){toast('导入失败：文件格式不正确')}
+  };
+  r.readAsText(file);
+}
+
+/* ========== 事件 ========== */
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2000)}
+
+document.addEventListener('click',ev=>{
+  const el=ev.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act;
+  switch(a){
+    case 'tab':
+      ui.tab=el.dataset.tab;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t===el));
+      document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+ui.tab));
+      if(ui.tab==='history'){const n=new Date();ui.calY=n.getFullYear();ui.calM=n.getMonth();ui.sel=todayKey()}
+      render();scrollTo(0,0);break;
+    case 'part':
+      ui.part=ui.part===el.dataset.id?null:el.dataset.id;renderToday();
+      if(ui.part){const s=$('#exSec');s&&s.scrollIntoView({behavior:'smooth',block:'nearest'})}break;
+    case 'ex': openEditor(ui.part,exList(ui.part)[+el.dataset.i]);break;
+    case 'delCustom':{
+      ev.stopPropagation();const n=el.dataset.n;
+      if(confirm(`删除自定义动作「${n}」？（已有记录不受影响）`)){S.custom[ui.part]=(S.custom[ui.part]||[]).filter(e=>e.n!==n);save();renderToday()}
+      break;}
+    case 'addCustom': openCustom();break;
+    case 'cuType': draft.t=el.dataset.t;$('#cu-r').style.boxShadow=draft.t==='r'?'0 0 0 2px var(--accent) inset':'';$('#cu-h').style.boxShadow=draft.t==='h'?'0 0 0 2px var(--accent) inset':'';break;
+    case 'saveCustom': saveCustom();break;
+    case 'closeSheet': closeSheet();break;
+    case 'setCount':{
+      const dd=+el.dataset.d;
+      if(dd>0){const l=draft.sets[draft.sets.length-1]||{r:draft.t==='h'?30:12,w:''};draft.sets.push({...l})}
+      else if(draft.sets.length>1)draft.sets.pop();
+      refreshSets();break;}
+    case 'addSet':{const l=draft.sets[draft.sets.length-1]||{r:draft.t==='h'?30:12,w:''};draft.sets.push({...l});refreshSets();break}
+    case 'rmSet': if(draft.sets.length>1){draft.sets.splice(+el.dataset.i,1);refreshSets()}else toast('至少保留一组');break;
+    case 'stepRep':{const i=+el.dataset.i;draft.sets[i].r=Math.max(0,num(draft.sets[i].r)+(+el.dataset.d));const inp=document.querySelector(`[data-rep="${i}"]`);inp.value=draft.sets[i].r;updEst();break}
+    case 'stepMin':{draft.minutes=Math.max(0,num(draft.minutes)+(+el.dataset.d));$('#ed-min').value=draft.minutes;updEst();break}
+    case 'saveEntry': saveEntry();break;
+    case 'editEntry':{const d=getDay(todayKey());const e=d&&d.entries.find(x=>x.id===el.dataset.id);if(e)openEditor(e.part,null,e);break}
+    case 'delEntry':{
+      const d=getDay(todayKey());const e=d&&d.entries.find(x=>x.id===el.dataset.id);
+      if(e&&confirm(`删除「${e.name}」这条记录？`)){d.entries=d.entries.filter(x=>x!==e);if(!d.entries.length)d.checked=false;save();renderToday();toast('已删除')}
+      break;}
+    case 'checkin': checkin();break;
+    case 'uncheck': if(confirm('撤销今天的打卡？')){const d=getDay(todayKey());if(d){d.checked=false;save();renderToday()}}break;
+    case 'calPrev': if(--ui.calM<0){ui.calM=11;ui.calY--}renderHistory();break;
+    case 'calNext': if(++ui.calM>11){ui.calM=0;ui.calY++}renderHistory();break;
+    case 'pickDay': ui.sel=el.dataset.k;renderHistory();break;
+    case 'export': exportData();break;
+    case 'import': $('#importFile').value='';$('#importFile').click();break;
+    case 'clear':
+      if(confirm('确定清空所有数据？此操作不可撤销！')&&confirm('再次确认：真的要清空吗？')){S=normalize({profile:S.profile});save();ui.part=null;render();toast('已清空')}
+      break;
+  }
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target;
+  if(!draft)return;
+  if(t.dataset.rep!=null){draft.sets[+t.dataset.rep].r=t.value;updEst()}
+  else if(t.dataset.w!=null){draft.sets[+t.dataset.w].w=t.value}
+  else if(t.id==='ed-min'){draft.minutes=t.value;updEst()}
+  else if(t.id==='ed-km'){draft.km=t.value}
+  else if(t.id==='ed-note'){draft.note=t.value}
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.dataset.pf){
+    const f=t.dataset.pf,v=num(t.value),lim={weight:[30,250],height:[100,250],age:[10,100]}[f];
+    if(v<lim[0]||v>lim[1]){toast('请输入合理的数值');t.value=S.profile[f]??'';return}
+    S.profile[f]=v;save();renderMe();toast('已保存');
+  }
+  if(t.id==='importFile'&&t.files&&t.files[0])importData(t.files[0]);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#sheet').classList.contains('on'))closeSheet()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+
+render();
+
+/* ========== PWA：离线缓存 ========== */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
