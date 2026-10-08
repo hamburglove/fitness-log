@@ -1,12 +1,13 @@
 /* 健身打卡 · Service Worker（离线缓存） */
-const CACHE = 'fitness-log-v2';
+const CACHE = 'fitness-log-v3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/apple-touch-icon.png',
+  './reminder.ics'
 ];
 
 self.addEventListener('install', (event) => {

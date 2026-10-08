@@ -1,0 +1,24 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//hamburglove//fitness-log//ZH-CN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:健身打卡
+BEGIN:VEVENT
+UID:fitness-log-daily-2100@hamburglove.github.io
+DTSTAMP:20261008T195234Z
+DTSTART:20261009T210000
+DURATION:PT10M
+RRULE:FREQ=DAILY
+SUMMARY:健身打卡 💪
+DESCRIPTION:今天练了吗？打开健身打卡记录训练：\nhttps://ha
+ mburglove.github.io/fitness-log/
+URL:https://hamburglove.github.io/fitness-log/
+TRANSP:TRANSPARENT
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:健身打卡 💪 今天还没打卡的话，记录一下吧
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

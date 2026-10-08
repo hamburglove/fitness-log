@@ -224,6 +224,24 @@ textarea{width:100%;border:0;border-radius:12px;background:var(--card2);padding:
 .food small{display:block;font-weight:400;color:var(--sub);font-size:11px}
 .fh{font-size:13px;font-weight:700;margin:12px 0 6px;display:flex;align-items:center;gap:6px}
 .disc{font-size:12px;color:var(--sub);text-align:center;margin:16px 8px 4px;line-height:1.6}
+.tab{position:relative}
+.tab .rd{position:absolute;top:4px;left:calc(50% + 8px);width:9px;height:9px;border-radius:50%;background:#F0506E;box-shadow:0 0 0 2px var(--card);display:none}
+.tab .rd.on{display:block}
+.remind{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#FFF4E8,#FFE9EE);border:1px solid rgba(240,80,110,.18);border-radius:18px;padding:12px 12px 12px 14px;margin-bottom:14px;animation:fade .3s ease}
+@media (prefers-color-scheme:dark){.remind{background:linear-gradient(135deg,#2B2219,#2D1D24);border-color:rgba(240,80,110,.3)}}
+.remind .bi{font-size:24px;flex:none}
+.remind .bt{flex:1;min-width:0;font-size:14px;font-weight:600;line-height:1.4}
+.remind .bt small{display:block;font-weight:400;color:var(--sub);font-size:12px}
+.remind .go{flex:none;background:#F0506E;color:#fff;border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700}
+.remind .x{flex:none;width:28px;height:28px;border-radius:50%;color:var(--sub);display:grid;place-items:center}
+.remind .x svg{width:16px;height:16px}
+.sw{position:relative;width:52px;height:32px;flex:none}
+.sw input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
+.sw span{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .2s}
+.sw span::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .2s}
+.sw input:checked+span{background:var(--ok)}
+.sw input:checked+span::after{transform:translateX(20px)}
+input[type=time].inp{width:140px;text-align:center}
 .toast{position:fixed;left:50%;bottom:calc(var(--sb) + 96px);transform:translate(-50%,20px);background:rgba(28,30,38,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 @media (min-width:480px){.parts{gap:10px}.part svg{width:40px;height:54px}}
@@ -243,7 +261,7 @@ textarea{width:100%;border:0;border-radius:12px;background:var(--card2);padding:
 </div>
 
 <nav class="tabs"><div class="in">
-  <button class="tab on" data-act="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12h11"/><rect x="3" y="8" width="3.5" height="8" rx="1"/><rect x="17.5" y="8" width="3.5" height="8" rx="1"/><path d="M1.5 10.5v3M22.5 10.5v3"/></svg>今日</button>
+  <button class="tab on" data-act="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12h11"/><rect x="3" y="8" width="3.5" height="8" rx="1"/><rect x="17.5" y="8" width="3.5" height="8" rx="1"/><path d="M1.5 10.5v3M22.5 10.5v3"/></svg>今日<i class="rd" id="today-dot"></i></button>
   <button class="tab" data-act="tab" data-tab="diet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 20h8"/><path d="M9 7c0-2 2-2 2-4M14 7c0-2 2-2 2-4"/></svg>饮食</button>
   <button class="tab" data-act="tab" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>历史</button>
   <button class="tab" data-act="tab" data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V5M16 20v-6M22 20H2"/></svg>统计</button>
@@ -397,7 +415,9 @@ function normalize(o){
   o=o&&typeof o==='object'?o:{};
   const pr=Object.assign({},DEFAULT_PROFILE,o.profile||{});
   pr.weight=num(pr.weight)||DEFAULT_PROFILE.weight;
-  return {v:1,profile:pr,custom:o.custom&&typeof o.custom==='object'?o.custom:{},days:o.days&&typeof o.days==='object'?o.days:{}};
+  const rm=Object.assign({on:true,time:'21:00',dismissed:'',notified:''},o.reminder||{});
+  if(!/^\d{2}:\d{2}$/.test(rm.time))rm.time='21:00';rm.on=!!rm.on;
+  return {v:1,profile:pr,reminder:rm,custom:o.custom&&typeof o.custom==='object'?o.custom:{},days:o.days&&typeof o.days==='object'?o.days:{}};
 }
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');return normalize(o)}catch(e){return normalize(null)}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('保存失败：浏览器存储不可用')}}
@@ -461,6 +481,7 @@ function renderToday(){
   const ents=d?d.entries:[],chk=isChecked(k),st=streak();
   let h=`<div class="top"><div><div class="d1">${dt.getMonth()+1}月${dt.getDate()}日</div><div class="d2">星期${WD[dt.getDay()]} · ${dt.getFullYear()}年</div></div>
     <div class="pill" title="连续打卡天数">${UI_IC.flame}${st} 天</div></div>`;
+  h+=bannerHTML();
   h+=`<div class="card summary"><div class="st"><span>今日训练</span><span class="badge">${chk?UI_IC.check.replace('<svg','<svg width="14" height="14"')+'已打卡':'未打卡'}</span></div>
     <div class="row"><div><div class="n">${ents.length}</div><div class="l">动作</div></div><div><div class="n">${daySets(d)}</div><div class="l">总组数</div></div>
     <div><div class="n">${dayKcal(d)}</div><div class="l">训练消耗 kcal（估算）</div></div></div>
@@ -566,6 +587,14 @@ function renderMe(){
     消耗为<b>估算值</b>，公式：kcal = MET × 体重(kg) × 时长(小时)。<br>
     力量训练时长按 每组(次数 × 3 秒 + 休息 60 秒) 累加；计时动作按 每组(秒数 + 60 秒)；有氧按填写的分钟数。<br>
     不同动作采用不同 MET（力量约 3.5–6，有氧按项目，如跑步 8.3、跳绳 11）。实际消耗因强度、个人体质差异较大，仅供参考。</div></div>`;
+  const R=S.reminder,np='Notification' in window?Notification.permission:'unsupported';
+  h+=`<div class="card sec set-list" id="reminder-card"><div class="sec-h" style="margin:0 0 2px"><h2>打卡提醒</h2><span class="hint">${R.on?'已开启':'已关闭'}</span></div>
+    <div class="it"><div class="lb">每日提醒<small>到点后打开 App 若未打卡会提示</small></div><label class="sw"><input type="checkbox" id="rm-on" ${R.on?'checked':''} aria-label="开启打卡提醒"><span></span></label></div>
+    <div class="it"><div class="lb">提醒时间</div><input class="inp" type="time" id="rm-time" value="${R.time}"></div>
+    <div style="padding:14px 0 4px"><button class="btn" data-act="addCal" id="rm-cal" style="font-size:15px">📅 添加到 iPhone 日历（每天弹出提醒）</button>
+    <div class="note" style="margin-top:10px">在 Safari 里点击后选择「添加全部」，之后每天 <b>${R.time}</b> 手机会弹出提醒；改时间后需要先在日历删除旧的再重新添加。<br>如果点了没反应，用 Safari 打开网页版再点，或直接打开 <a href="reminder.ics" style="color:var(--accent)">默认 21:00 提醒文件</a>。</div></div>
+    ${np==='unsupported'?'':`<div class="it"><div class="lb">App 内通知<small>${np==='granted'?'已允许：打开 App 时若未打卡会弹通知':np==='denied'?'已拒绝，可在系统设置中开启':'打开 App 时若已过提醒时间且未打卡，弹出通知'}</small></div>${np==='default'?`<button class="btn ghost" style="width:auto;padding:9px 14px" data-act="askNotify">允许通知</button>`:''}</div>`}
+    <div class="note" style="padding-top:8px">网页版无法在后台定时推送，每天准时弹出提醒请使用上方「添加到日历」。</div></div>`;
   h+=`<div class="card sec"><div class="sec-h" style="margin:0 0 6px"><h2>添加到手机桌面</h2></div><div class="note">
     iPhone：用 Safari 打开本页 → 点底部「分享」按钮 → 选择「添加到主屏幕」，即可像 App 一样全屏使用，离线可用。<br>
     安卓：用 Chrome 打开 → 菜单 →「添加到主屏幕 / 安装应用」。<br>数据保存在本机浏览器中，请定期备份。</div></div>`;
@@ -613,7 +642,7 @@ function setTab(name){
   if(name==='history'){const n=new Date();ui.calY=n.getFullYear();ui.calM=n.getMonth();ui.sel=todayKey()}
   render();scrollTo(0,0);
 }
-function render(){({today:renderToday,diet:renderDiet,history:renderHistory,stats:renderStats,me:renderMe})[ui.tab]()}
+function render(){updateDot();({today:renderToday,diet:renderDiet,history:renderHistory,stats:renderStats,me:renderMe})[ui.tab]()}
 
 /* ========== 记录面板（底部弹层）========== */
 function openSheet(html){const sh=$('#sheet');sh.innerHTML='<div class="grab"></div>'+html;sh.scrollTop=0;$('#mask').classList.add('on');sh.classList.add('on')}
@@ -702,11 +731,65 @@ function saveCustom(){
 }
 
 /* ========== 打卡 ========== */
+/* ========== 打卡提醒 ========== */
+const APP_URL='https://hamburglove.github.io/fitness-log/';
+function pastReminder(){const [h,m]=S.reminder.time.split(':').map(Number);const n=new Date();return n.getHours()*60+n.getMinutes()>=h*60+m}
+function reminderPending(){return S.reminder.on&&pastReminder()&&!isChecked(todayKey())}
+function bannerVisible(){return reminderPending()&&S.reminder.dismissed!==todayKey()}
+function updateDot(){const d=$('#today-dot');if(d)d.classList.toggle('on',reminderPending())}
+function bannerHTML(){
+  if(!bannerVisible())return '';
+  return `<div class="remind" id="remind-banner"><span class="bi">⏰</span><div class="bt">今天还没打卡哦，记录一下今天的训练吧<small>提醒时间 ${S.reminder.time}</small></div><button class="go" data-act="goRecord">去记录</button><button class="x" data-act="dismissBanner" aria-label="关闭提醒">${UI_IC.close}</button></div>`;
+}
+function maybeNotify(){
+  try{
+    if(!reminderPending()||!('Notification' in window)||Notification.permission!=='granted'||S.reminder.notified===todayKey())return;
+    S.reminder.notified=todayKey();save();
+    const opt={body:'今天还没打卡哦，记录一下今天的训练吧',icon:'icons/icon-192.png',tag:'fitlog-remind'};
+    if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.ready.then(r=>r.showNotification('健身打卡 💪',opt)).catch(()=>{});
+    else new Notification('健身打卡 💪',opt);
+  }catch(e){}
+}
+async function askNotify(){
+  if(!('Notification' in window))return toast('当前环境不支持通知，请使用日历提醒');
+  try{const r=await Notification.requestPermission();toast(r==='granted'?'已允许通知（打开 App 时提醒）':'未获得通知权限');renderMe();maybeNotify()}catch(e){toast('无法请求通知权限')}
+}
+function icsEsc(t){return String(t).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
+function icsFold(line){
+  // 按 75 字节折行（UTF-8，不拆分多字节字符）
+  const enc=new TextEncoder();const out=[];let cur='',len=0,limit=75;
+  for(const ch of line){const b=enc.encode(ch).length;if(len+b>limit){out.push(cur);cur=' '+ch;len=1+b;}else{cur+=ch;len+=b}}
+  out.push(cur);return out.join('\r\n');
+}
+function buildICS(time){
+  time=time||S.reminder.time;const [h,m]=time.split(':').map(Number);
+  const n=new Date(),d=`${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}`;
+  const st=`${d}T${pad(h)}${pad(m)}00`;
+  const u=new Date(),stamp=`${u.getUTCFullYear()}${pad(u.getUTCMonth()+1)}${pad(u.getUTCDate())}T${pad(u.getUTCHours())}${pad(u.getUTCMinutes())}${pad(u.getUTCSeconds())}Z`;
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//hamburglove//fitness-log//ZH-CN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:健身打卡',
+    'BEGIN:VEVENT',`UID:fitness-log-daily-${pad(h)}${pad(m)}-${stamp}@hamburglove.github.io`,`DTSTAMP:${stamp}`,`DTSTART:${st}`,'DURATION:PT10M','RRULE:FREQ=DAILY',
+    'SUMMARY:'+icsEsc('健身打卡 💪'),'DESCRIPTION:'+icsEsc('今天练了吗？打开健身打卡记录训练：\n'+APP_URL),'URL:'+APP_URL,'TRANSP:TRANSPARENT',
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc('健身打卡 💪 今天还没打卡的话，记录一下吧'),'TRIGGER:PT0M','END:VALARM',
+    'END:VEVENT','END:VCALENDAR'];
+  return L.map(icsFold).join('\r\n')+'\r\n';
+}
+function isIOS(){return /iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
+function isStandalone(){return !!(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches))}
+function addToCalendar(){
+  const ics=buildICS(),name=`健身打卡提醒-${S.reminder.time.replace(':','')}.ics`;
+  if(isIOS()&&isStandalone()){location.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);return}
+  const url=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));
+  if(isIOS()){location.href=url;setTimeout(()=>URL.revokeObjectURL(url),60000);return}
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1000);toast('已生成日历文件，打开即可添加');
+}
+function reminderTick(){updateDot();if(ui.tab==='today'){const b=$('#remind-banner');if(!!b!==bannerVisible())renderToday()}maybeNotify()}
+
 function checkin(){
   const k=todayKey(),d=getDay(k);
   if(isChecked(k))return toast('今天已经打过卡啦 💪');
   if(!d||!d.entries.length)return toast('先添加至少一个动作再打卡');
-  d.checked=true;d.checkedAt=Date.now();save();render();
+  d.checked=true;d.checkedAt=Date.now();save();render();updateDot();
   toast(`打卡成功！已连续 ${streak()} 天 🎉`);
 }
 
@@ -745,6 +828,10 @@ document.addEventListener('click',ev=>{
   const a=el.dataset.act;
   switch(a){
     case 'tab': ev.preventDefault();setTab(el.dataset.tab);break;
+    case 'goRecord': if(ui.tab!=='today')setTab('today');{const pe=document.querySelector('.parts');pe&&pe.scrollIntoView({behavior:'smooth',block:'center'})}toast('选个部位开始记录吧');break;
+    case 'dismissBanner': S.reminder.dismissed=todayKey();save();renderToday();break;
+    case 'addCal': addToCalendar();break;
+    case 'askNotify': askNotify();break;
     case 'goal': S.profile.goal=el.dataset.g;save();renderDiet();toast('目标已切换为「'+GOALS.find(x=>x[0]===el.dataset.g)[1]+'」');break;
     case 'part':
       ui.part=ui.part===el.dataset.id?null:el.dataset.id;renderToday();
@@ -802,12 +889,15 @@ document.addEventListener('change',ev=>{
     S.profile[f]=v;save();renderMe();toast('已保存');
   }
   if(t.dataset.pfs){const f=t.dataset.pfs;S.profile[f]=f==='activity'?num(t.value):t.value;save();renderMe();toast('已保存')}
+  if(t.id==='rm-on'){S.reminder.on=t.checked;save();renderMe();updateDot();toast(t.checked?'已开启打卡提醒':'已关闭打卡提醒')}
+  if(t.id==='rm-time'&&/^\d{2}:\d{2}$/.test(t.value)){S.reminder.time=t.value;S.reminder.dismissed='';save();renderMe();updateDot();toast('提醒时间已设为 '+t.value)}
   if(t.id==='importFile'&&t.files&&t.files[0])importData(t.files[0]);
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#sheet').classList.contains('on'))closeSheet()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();maybeNotify()}});
+setInterval(reminderTick,30000);
 
-render();
+render();maybeNotify();
 
 /* ========== PWA：离线缓存 ========== */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
