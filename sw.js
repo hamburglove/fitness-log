@@ -1,5 +1,5 @@
 /* 健身打卡 · Service Worker（离线缓存） */
-const CACHE = 'fitness-log-v3';
+const CACHE = 'fitness-log-v4';
 const ASSETS = [
   './',
   './index.html',

@@ -242,6 +242,41 @@ textarea{width:100%;border:0;border-radius:12px;background:var(--card2);padding:
 .sw input:checked+span{background:var(--ok)}
 .sw input:checked+span::after{transform:translateX(20px)}
 input[type=time].inp{width:140px;text-align:center}
+.day.plan{background:transparent;border:2px dashed #9B5CF6;color:#9B5CF6}
+.day.plan.chk{border-style:solid}
+.day .pm{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#9B5CF6}
+.planb{display:flex;align-items:flex-start;gap:12px;background:linear-gradient(135deg,#F3EEFF,#E8F0FF);border:1px solid rgba(155,92,246,.22);border-radius:18px;padding:12px 12px 12px 14px;margin-bottom:14px}
+@media (prefers-color-scheme:dark){.planb{background:linear-gradient(135deg,#221B33,#1A2233);border-color:rgba(155,92,246,.35)}}
+.planb .bi{font-size:22px;flex:none;line-height:1.2}
+.planb .bt{flex:1;min-width:0;font-size:14px;font-weight:600}
+.planb .bt small{display:block;font-weight:400;color:var(--sub);font-size:12px;margin-top:2px;line-height:1.45}
+.planb .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.planb .chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(155,92,246,.12);color:#8B5CF6}
+.planb .chip.done{background:rgba(34,176,125,.15);color:#22B07D}
+.tpl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.tpl button{text-align:left;background:var(--card2);border-radius:14px;padding:12px;border:2px solid transparent}
+.tpl button.on{border-color:var(--accent);background:rgba(91,108,255,.08)}
+.tpl b{display:block;font-size:14px}
+.tpl small{color:var(--sub);font-size:12px}
+.picks{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.picks button{padding:8px 12px;border-radius:999px;background:var(--card2);font-weight:600;font-size:13px;border:2px solid transparent}
+.picks button.on{border-color:var(--c);background:var(--t);color:var(--c)}
+.prog{margin:10px 0}
+.prog .h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;font-size:13px}
+.prog .h b{font-size:15px}
+.prog .bar{height:10px;border-radius:6px;background:var(--card2);overflow:hidden}
+.prog .bar i{display:block;height:100%;border-radius:6px;min-width:0;transition:width .25s}
+.prog.over .bar i{background:#F0506E !important}
+.prog.over .h b{color:#F0506E}
+.flog{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:11px 12px;margin-bottom:8px}
+.flog .mid{flex:1;min-width:0}
+.flog .t{font-weight:600}
+.flog .s{font-size:12.5px;color:var(--sub)}
+.flog .kc{font-weight:700;color:#E8742A;white-space:nowrap;font-size:13px}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fgrid button{background:var(--card2);border-radius:14px;padding:10px 6px;text-align:center}
+.fgrid .nm{font-weight:700;font-size:13px}
+.fgrid .mk{font-size:11px;color:var(--sub);margin-top:2px}
 .toast{position:fixed;left:50%;bottom:calc(var(--sb) + 96px);transform:translate(-50%,20px);background:rgba(28,30,38,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 @media (min-width:480px){.parts{gap:10px}.part svg{width:40px;height:54px}}
@@ -304,6 +339,66 @@ const EX={
 };
 const DEFAULT_PROFILE={weight:79,height:178,age:22,sex:'male',activity:1.375,goal:'cut'};
 const GOALS=[['cut','减脂'],['keep','维持'],['bulk','增肌']];
+const PLANS={
+  lean:{id:'lean',name:'薄肌上肢优先',desc:'每周 3–4 练 · 上肢+有氧+核心',tip:'适合每周练 3–4 天的薄肌/线条向：①推日+核心 ②拉日+核心 ③肩臂+有氧，第 4 天可选轻腿或再加一次有氧，其余休息。推拉中等重量 8–15 次，肩臂可更高次数；有氧跑步/单车 20–30 分钟；核心放训练结尾。蛋白充足、控制总热量。以上为一般训练建议，不是医疗建议。',
+    cycle:[
+      {id:'push',name:'推日+核心',parts:['chest','sfront','sside','triceps','abs'],ex:[['chest','哑铃卧推'],['chest','龙门架夹胸'],['sfront','哑铃推举'],['sside','哑铃侧平举'],['triceps','绳索下压'],['abs','卷腹']]},
+      {id:'rest1',name:'休息',parts:[],ex:[]},
+      {id:'pull',name:'拉日+核心',parts:['back','srear','biceps','abs'],ex:[['back','引体向上'],['back','坐姿划船'],['srear','面拉'],['biceps','哑铃弯举'],['abs','平板支撑']]},
+      {id:'rest2',name:'休息',parts:[],ex:[]},
+      {id:'arms',name:'肩臂+有氧',parts:['sside','sfront','biceps','triceps','cardio','abs'],ex:[['sside','哑铃侧平举'],['sfront','哑铃前平举'],['biceps','杠铃弯举'],['triceps','颈后臂屈伸'],['cardio','跑步'],['abs','健腹轮']]},
+      {id:'opt',name:'可选：轻腿/有氧',parts:['legs','cardio','abs'],ex:[['legs','箭步蹲'],['legs','腿屈伸'],['cardio','单车'],['abs','仰卧举腿']]},
+      {id:'rest3',name:'休息',parts:[],ex:[]}
+    ]},
+  ppl:{id:'ppl',name:'PPL',desc:'推 / 拉 / 腿 循环',tip:'适合中级训练者。每周推拉腿各练 1–2 次，每组 8–12 次，组间休息 90–120 秒；能完成上限次数就加重（渐进超负荷）。推日侧重胸肩三头，拉日背与二头，腿日下肢+核心。以上为一般训练建议，不是医疗建议。',
+    cycle:[
+      {id:'push',name:'推日',parts:['chest','sfront','sside','triceps'],ex:[['chest','杠铃卧推'],['sfront','杠铃推举'],['sside','哑铃侧平举'],['triceps','绳索下压']]},
+      {id:'pull',name:'拉日',parts:['back','srear','biceps'],ex:[['back','引体向上'],['back','杠铃划船'],['srear','面拉'],['biceps','杠铃弯举']]},
+      {id:'legs',name:'腿日',parts:['legs','abs'],ex:[['legs','杠铃深蹲'],['legs','罗马尼亚硬拉'],['abs','卷腹'],['cardio','快走']]},
+      {id:'rest',name:'休息',parts:[],ex:[]}
+    ]},
+  ul:{id:'ul',name:'上下肢',desc:'Upper / Lower 分化',tip:'每周上肢、下肢各练 2 次，中间穿插休息。上肢日胸背肩臂，下肢日深蹲/硬拉类+核心。每组 6–12 次，组间休息 2 分钟左右，优先保证动作标准。以上为一般训练建议，不是医疗建议。',
+    cycle:[
+      {id:'upper',name:'上肢',parts:['chest','back','sfront','biceps','triceps'],ex:[['chest','哑铃卧推'],['back','高位下拉'],['sfront','哑铃推举'],['biceps','哑铃弯举'],['triceps','绳索下压']]},
+      {id:'lower',name:'下肢',parts:['legs','abs'],ex:[['legs','杠铃深蹲'],['legs','腿举'],['legs','箭步蹲'],['abs','平板支撑']]},
+      {id:'rest',name:'休息',parts:[],ex:[]},
+      {id:'upper',name:'上肢',parts:['chest','back','sside','srear','biceps','triceps'],ex:[['chest','上斜卧推'],['back','坐姿划船'],['sside','哑铃侧平举'],['srear','俯身飞鸟']]},
+      {id:'lower',name:'下肢',parts:['legs','abs','cardio'],ex:[['legs','罗马尼亚硬拉'],['legs','腿屈伸'],['abs','仰卧举腿'],['cardio','单车']]},
+      {id:'rest',name:'休息',parts:[],ex:[]},
+      {id:'rest',name:'休息',parts:[],ex:[]}
+    ]},
+  full:{id:'full',name:'全身',desc:'全身训练 3 天',tip:'适合新手或恢复期。每周练 3 天全身，天与天之间至少休息 1 天。每部位 2–3 个动作、共 3–4 组，组间休息 90 秒；循序渐进增加重量。以上为一般训练建议，不是医疗建议。',
+    cycle:[
+      {id:'a',name:'全身 A',parts:['chest','back','legs'],ex:[['chest','杠铃卧推'],['back','引体向上'],['legs','杠铃深蹲'],['abs','卷腹']]},
+      {id:'rest',name:'休息',parts:[],ex:[]},
+      {id:'b',name:'全身 B',parts:['sfront','sside','legs','abs'],ex:[['sfront','哑铃推举'],['sside','哑铃侧平举'],['legs','箭步蹲'],['abs','平板支撑']]},
+      {id:'rest',name:'休息',parts:[],ex:[]},
+      {id:'c',name:'全身 C',parts:['back','biceps','triceps','legs'],ex:[['back','高位下拉'],['biceps','杠铃弯举'],['triceps','窄距卧推'],['legs','腿举']]},
+      {id:'rest',name:'休息',parts:[],ex:[]},
+      {id:'rest',name:'休息',parts:[],ex:[]}
+    ]},
+  custom:{id:'custom',name:'自定义',desc:'手动选择部位',tip:'按自己的节奏安排部位；注意同一肌群相邻两天不要练太狠，给恢复留时间。以上为一般训练建议，不是医疗建议。',cycle:null}
+};
+const FOODS=[
+  {id:'rice',name:'米饭',unit:'g',base:100,kcal:116,p:2.6,c:26,f:0.3},
+  {id:'chicken',name:'鸡胸肉',unit:'g',base:100,kcal:133,p:23.3,c:0,f:1.5},
+  {id:'egg',name:'鸡蛋',unit:'份',base:1,kcal:72,p:6.3,c:0.6,f:4.9},
+  {id:'milk',name:'牛奶',unit:'g',base:250,kcal:135,p:7.5,c:12.5,f:8},
+  {id:'banana',name:'香蕉',unit:'份',base:1,kcal:105,p:1.3,c:27,f:0.4},
+  {id:'broccoli',name:'西兰花',unit:'g',base:100,kcal:34,p:2.8,c:7,f:0.4},
+  {id:'oats',name:'燕麦',unit:'g',base:40,kcal:147,p:6,c:24.4,f:2.8},
+  {id:'tofu',name:'北豆腐',unit:'g',base:100,kcal:98,p:12.2,c:2,f:4.8},
+  {id:'yogurt',name:'无糖酸奶',unit:'g',base:150,kcal:90,p:6,c:7.5,f:4.5},
+  {id:'sweetpotato',name:'红薯',unit:'g',base:200,kcal:172,p:3.2,c:40,f:0.2},
+  {id:'beef',name:'瘦牛肉',unit:'g',base:100,kcal:125,p:20,c:0,f:5},
+  {id:'shrimp',name:'虾仁',unit:'g',base:100,kcal:93,p:18,c:0.5,f:1.5},
+  {id:'apple',name:'苹果',unit:'份',base:1,kcal:95,p:0.5,c:25,f:0.3},
+  {id:'bread',name:'全麦面包',unit:'份',base:1,kcal:80,p:4,c:14,f:1.2},
+  {id:'potato',name:'土豆',unit:'g',base:100,kcal:81,p:2,c:17.8,f:0.2},
+  {id:'salmon',name:'三文鱼',unit:'g',base:100,kcal:208,p:20,c:0,f:13}
+];
+const FM=Object.fromEntries(FOODS.map(f=>[f.id,f]));
+
 const ACTIVITY=[[1.2,'久坐','几乎不运动'],[1.375,'轻度','每周1-3次'],[1.55,'中度','每周3-5次'],[1.725,'高度','每周6-7次'],[1.9,'极高','每天两练']];
 // Mifflin-St Jeor 基础代谢
 const bmr=p=>Math.round(10*num(p.weight)+6.25*num(p.height)-5*num(p.age)+(p.sex==='female'?-161:5));
@@ -417,13 +512,19 @@ function normalize(o){
   pr.weight=num(pr.weight)||DEFAULT_PROFILE.weight;
   const rm=Object.assign({on:true,time:'21:00',dismissed:'',notified:''},o.reminder||{});
   if(!/^\d{2}:\d{2}$/.test(rm.time))rm.time='21:00';rm.on=!!rm.on;
-  return {v:1,profile:pr,reminder:rm,custom:o.custom&&typeof o.custom==='object'?o.custom:{},days:o.days&&typeof o.days==='object'?o.days:{}};
+  const foodLib=Array.isArray(o.foodLib)?o.foodLib:[];
+  const planTpl=PLANS[o.planTemplate]?o.planTemplate:'lean';
+  const days=o.days&&typeof o.days==='object'?o.days:{};
+  for(const k in days){const d=days[k];if(!d)continue;if(!Array.isArray(d.entries))d.entries=[];if(!Array.isArray(d.foods))d.foods=[];if(d.plan&&!Array.isArray(d.plan.parts))d.plan=null}
+  return {v:1,profile:pr,reminder:rm,custom:o.custom&&typeof o.custom==='object'?o.custom:{},foodLib,planTemplate:planTpl,days};
 }
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');return normalize(o)}catch(e){return normalize(null)}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('保存失败：浏览器存储不可用')}}
 S=load();
-const getDay=(k,create)=>{if(!S.days[k]&&create)S.days[k]={entries:[],checked:false};return S.days[k]};
+const getDay=(k,create)=>{if(!S.days[k]&&create)S.days[k]={entries:[],checked:false,foods:[],plan:null};if(S.days[k]){if(!Array.isArray(S.days[k].foods))S.days[k].foods=[];if(S.days[k].plan===undefined)S.days[k].plan=null}return S.days[k]};
 const isChecked=k=>!!(S.days[k]&&S.days[k].checked);
+const dayPlan=k=>{const d=S.days[k];return d&&d.plan&&d.plan.parts&&d.plan.parts.length?d.plan:null};
+const hasPlan=k=>!!dayPlan(k);
 const exList=part=>[...EX[part].map(e=>({n:e[0],i:e[1],m:e[2],t:e[3]})),...(S.custom[part]||[]).map(e=>({...e,custom:1}))];
 
 /* ========== 卡路里估算（MET）========== */
@@ -437,6 +538,11 @@ const kcal=e=>Math.round(num(e.m)*(num(e.bw)||S.profile.weight)*hours(e));
 const dayKcal=d=>d?d.entries.reduce((a,e)=>a+kcal(e),0):0;
 const daySets=d=>d?d.entries.reduce((a,e)=>a+(e.t==='c'?0:(e.sets||[]).length),0):0;
 const dayParts=d=>d?PARTS.filter(p=>d.entries.some(e=>e.part===p.id)):[];
+function scaleFood(base,amount){const r=num(amount)/num(base.base||1);return {kcal:Math.round(base.kcal*r),p:+(base.p*r).toFixed(1),c:+(base.c*r).toFixed(1),f:+(base.f*r).toFixed(1)}}
+function foodMacros(f){if(f.kcal!=null&&f.kcal!=='')return {kcal:Math.round(num(f.kcal)),p:num(f.p),c:num(f.c),f:num(f.f)};const base=f.baseId&&FM[f.baseId]?FM[f.baseId]:(S.foodLib||[]).find(x=>x.id===f.baseId);if(base)return scaleFood(base,f.amount);return {kcal:Math.round(num(f.kcal)),p:num(f.p),c:num(f.c),f:num(f.f)}}
+function dayFoodSum(d){const z={kcal:0,p:0,c:0,f:0};if(!d||!d.foods)return z;for(const x of d.foods){const m=foodMacros(x);z.kcal+=m.kcal;z.p+=m.p;z.c+=m.c;z.f+=m.f}z.p=+z.p.toFixed(1);z.c=+z.c.toFixed(1);z.f=+z.f.toFixed(1);return z}
+function planProgress(k){const pl=dayPlan(k),d=getDay(k);if(!pl)return null;const done=pl.parts.filter(pid=>(d&&d.entries||[]).some(e=>e.part===pid));return {total:pl.parts.length,done:done.length,parts:pl.parts,doneParts:done}}
+
 
 function summary(e){
   if(e.t==='c'){let s=`${num(e.minutes)} 分钟`;if(num(e.km)>0)s+=` · ${num(e.km)} km`;return s}
@@ -450,7 +556,7 @@ function summary(e){
 
 /* ========== 状态 ========== */
 const now=new Date();
-const ui={tab:'today',part:null,calY:now.getFullYear(),calM:now.getMonth(),sel:todayKey()};
+const ui={tab:'today',part:null,calY:now.getFullYear(),calM:now.getMonth(),sel:todayKey(),foodFilter:''};
 let draft=null,sheetMode=null;
 
 /* ========== 统计 ========== */
@@ -482,6 +588,14 @@ function renderToday(){
   let h=`<div class="top"><div><div class="d1">${dt.getMonth()+1}月${dt.getDate()}日</div><div class="d2">星期${WD[dt.getDay()]} · ${dt.getFullYear()}年</div></div>
     <div class="pill" title="连续打卡天数">${UI_IC.flame}${st} 天</div></div>`;
   h+=bannerHTML();
+  const pl=dayPlan(k),pg=planProgress(k);
+  if(pl){
+    const chips=pl.parts.map(pid=>{const pp=PM[pid];const done=pg&&pg.doneParts.includes(pid);return `<span class="chip${done?' done':''}">${pp?pp.name:pid}${done?' ✓':''}</span>`}).join('');
+    const sug=(pl.ex||[]).slice(0,4).map(e=>e[1]).join('、');
+    h+=`<div class="planb" id="plan-banner"><span class="bi">📋</span><div class="bt">今日计划 · ${esc(pl.name||'训练日')}<small>${sug?('建议动作：'+sug):'按计划部位开练'} · 进度 ${pg?pg.done:0}/${pg?pg.total:0}</small><div class="chips">${chips}</div></div></div>`;
+  }else if(getDay(k)&&getDay(k).plan&&!(getDay(k).plan.parts||[]).length){
+    h+=`<div class="planb"><span class="bi">😴</span><div class="bt">今日计划：休息日<small>好好恢复，也可以轻度拉伸或散步</small></div></div>`;
+  }
   h+=`<div class="card summary"><div class="st"><span>今日训练</span><span class="badge">${chk?UI_IC.check.replace('<svg','<svg width="14" height="14"')+'已打卡':'未打卡'}</span></div>
     <div class="row"><div><div class="n">${ents.length}</div><div class="l">动作</div></div><div><div class="n">${daySets(d)}</div><div class="l">总组数</div></div>
     <div><div class="n">${dayKcal(d)}</div><div class="l">训练消耗 kcal（估算）</div></div></div>
@@ -523,20 +637,37 @@ function entriesHTML(ents,editable){
 function renderHistory(){
   const y=ui.calY,m=ui.calM,first=new Date(y,m,1),off=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate(),tk=todayKey();
   const top=topPart(lastNKeys(30)),wk=weekKeys().filter(isChecked).length;
-  let h=`<div class="top"><div><div class="d1">训练日历</div><div class="d2">点日期查看当天详情</div></div><div class="pill">${UI_IC.flame}${streak()} 天</div></div>`;
+  const tpl=PLANS[S.planTemplate]||PLANS.lean;
+  let h=`<div class="top"><div><div class="d1">训练日历</div><div class="d2">点日期查看 · 可规划训练</div></div><div class="pill">${UI_IC.flame}${streak()} 天</div></div>`;
   h+=`<div class="sg"><div class="sc"><div class="n">${streak()}<small>天</small></div><div class="l">连续打卡</div></div><div class="sc"><div class="n">${wk}<small>次</small></div><div class="l">本周训练</div></div><div class="sc"><div class="n" style="font-size:18px;line-height:1.55;color:${top?top.color:'var(--sub)'}">${top?top.name:'—'}</div><div class="l">最常练部位</div></div></div>`;
+  h+=`<div class="card sec" id="plan-box"><div class="sec-h" style="margin:0 0 6px"><h2>训练计划</h2><span class="hint">当前：${tpl.name}</span></div>
+    <div class="tpl">${Object.values(PLANS).map(t=>`<button class="${S.planTemplate===t.id?'on':''}" data-act="pickTpl" data-id="${t.id}"><b>${t.name}</b><small>${t.desc}</small></button>`).join('')}</div>
+    <div class="note" style="margin:4px 0 10px">${esc(tpl.tip)}</div>
+    <button class="btn" data-act="genWeek" id="gen-week">✨ 生成本周计划（今天起 7 天）</button>
+    <div class="note" style="margin-top:8px">也可点日历某一天单独安排 / 修改计划。紫色虚线框 = 已安排未打卡；实心色块 = 已打卡。</div></div>`;
   h+=`<div class="card sec"><div class="cal-h"><button class="ib" data-act="calPrev" aria-label="上个月">${UI_IC.left}</button><div class="m">${y}年${m+1}月</div><button class="ib" data-act="calNext" aria-label="下个月">${UI_IC.right}</button></div><div class="cal-g">`;
   for(const w of ['一','二','三','四','五','六','日']) h+=`<div class="wd">${w}</div>`;
   for(let i=0;i<off;i++) h+=`<div class="day out"></div>`;
   for(let dd=1;dd<=days;dd++){
-    const k=`${y}-${pad(m+1)}-${pad(dd)}`,d=S.days[k],ps=dayParts(d),chk=isChecked(k);
-    const cls=['day'];if(chk)cls.push('chk');if(k===tk)cls.push('today');if(k===ui.sel)cls.push('sel');if(k>tk)cls.push('fut');
+    const k=`${y}-${pad(m+1)}-${pad(dd)}`,d=S.days[k],ps=dayParts(d),chk=isChecked(k),planned=hasPlan(k)||(d&&d.plan);
+    const cls=['day'];if(chk)cls.push('chk');else if(planned)cls.push('plan');if(k===tk)cls.push('today');if(k===ui.sel)cls.push('sel');if(k>tk)cls.push('fut');
     const sty=chk&&ps.length?cv(ps[0]):chk?'--c:var(--ok);--t:rgba(34,176,125,.14)':'';
-    h+=`<button class="${cls.join(' ')}" style="${sty}" data-act="pickDay" data-k="${k}">${dd}<span class="dots">${ps.slice(0,4).map(p=>`<i style="background:${p.color}"></i>`).join('')}</span></button>`;
+    const dots=ps.length?ps.slice(0,4).map(p=>`<i style="background:${p.color}"></i>`).join(''):(planned&&!chk?'<i class="pm"></i>':'');
+    h+=`<button class="${cls.join(' ')}" style="${sty}" data-act="pickDay" data-k="${k}">${dd}<span class="dots">${dots}</span></button>`;
   }
-  h+=`</div><div class="legend">${PARTS.map(p=>`<span><i class="dot" style="background:${p.color}"></i>${p.name}</span>`).join('')}</div></div>`;
-  const sd=S.days[ui.sel],sdt=pkey(ui.sel);
-  h+=`<div class="sec"><div class="sec-h"><h2>${sdt.getMonth()+1}月${sdt.getDate()}日 星期${WD[sdt.getDay()]}</h2><span class="hint">${isChecked(ui.sel)?'✅ 已打卡':'未打卡'} · ${dayKcal(sd)} kcal</span></div>${entriesHTML(sd?sd.entries:[],false)}</div>`;
+  h+=`</div><div class="legend"><span><i class="dot" style="background:#9B5CF6"></i>已规划</span>${PARTS.map(p=>`<span><i class="dot" style="background:${p.color}"></i>${p.name}</span>`).join('')}</div></div>`;
+  const sd=S.days[ui.sel],sdt=pkey(ui.sel),canEdit=ui.sel>=tk;
+  const pl=sd&&sd.plan;
+  h+=`<div class="sec" id="day-detail"><div class="sec-h"><h2>${sdt.getMonth()+1}月${sdt.getDate()}日 星期${WD[sdt.getDay()]}</h2><span class="hint">${isChecked(ui.sel)?'✅ 已打卡':(ui.sel>tk?'未到':'未打卡')} · ${dayKcal(sd)} kcal</span></div>`;
+  if(pl){
+    const rest=!pl.parts||!pl.parts.length;
+    h+=`<div class="card" style="margin-bottom:10px"><div class="sec-h" style="margin:0 0 6px"><h2>当天计划 · ${esc(pl.name||'')}</h2>${canEdit?`<button class="hint" data-act="editPlan" data-k="${ui.sel}" style="color:var(--accent);font-weight:600">修改</button>`:''}</div>
+      ${rest?'<div class="note">休息日</div>':`<div class="chips" style="display:flex;flex-wrap:wrap;gap:6px">${pl.parts.map(pid=>{const pp=PM[pid];return `<span class="chip" style="background:${tint((pp||{}).color||'#999',.15)};color:${(pp||{}).color||'#999'}">${pp?pp.name:pid}</span>`}).join('')}</div>
+      ${(pl.ex||[]).length?`<div class="note" style="margin-top:8px">建议：${pl.ex.map(e=>e[1]).join('、')}</div>`:''}`}</div>`;
+  }else if(canEdit){
+    h+=`<button class="btn ghost" data-act="editPlan" data-k="${ui.sel}" style="margin-bottom:10px">＋ 为这天安排训练计划</button>`;
+  }
+  h+=`${entriesHTML(sd?sd.entries:[],false)}</div>`;
   $('#v-history').innerHTML=h;
 }
 
@@ -621,6 +752,14 @@ function renderDiet(){
     <div class="mlist">${M.map((m,i)=>`<div class="mrow"><div class="h"><span class="nm"><i class="dot" style="background:${m[1]}"></i>${m[0]}</span><span class="g" id="d-m${i}">${m[2].g}<small> g</small></span></div>
       <div class="sub">${m[2].k} kcal · ${m[2].pct}%</div><div class="bar"><i style="width:${m[2].pct}%;background:${m[1]}"></i></div></div>`).join('')}</div></div>
     <div class="note" style="margin-top:6px">蛋白质 ${n.pPer} g/kg${n.g==='cut'?`（推荐范围 1.6–2.2 g/kg：${n.pRange[0]}–${n.pRange[1]} g）`:''}；脂肪占目标热量 25%（不低于 0.6 g/kg）；碳水 = 剩余热量。</div></div>`;
+  // ---- 今日饮食记录 ----
+  const day=getDay(todayKey()), intake=dayFoodSum(day), foods=day?day.foods:[];
+  const bars=[['热量','kcal',intake.kcal,n.target,'#FF8A3D'],['蛋白质','g',intake.p,n.p.g,'#FF6B6B'],['碳水','g',intake.c,n.c.g,'#4C8DF6'],['脂肪','g',intake.f,n.f.g,'#F5A524']];
+  h+=`<div class="card sec" id="food-log"><div class="sec-h" style="margin:0 0 6px"><h2>今日饮食</h2><span class="hint">${foods.length} 项 · ${intake.kcal} / ${n.target} kcal</span></div>`;
+  for(const [lb,u,v,tg,col] of bars){const pct=tg?Math.min(140,Math.round(v/tg*100)):0;const over=v>tg;h+=`<div class="prog${over?' over':''}"><div class="h"><span>${lb}</span><b id="fl-${lb}">${typeof v==='number'&&u==='g'?v.toFixed(1):v}<small style="font-weight:600;color:var(--sub)"> / ${tg} ${u}${over?' · 超了':''}</small></b></div><div class="bar"><i style="width:${Math.min(100,pct)}%;background:${col}"></i></div></div>`}
+  if(foods.length){for(const f of foods){const m=foodMacros(f);h+=`<div class="flog"><div class="mid"><div class="t">${esc(f.name)}</div><div class="s">${f.amount}${f.unit||'g'} · 蛋白 ${m.p}g · 碳水 ${m.c}g · 脂肪 ${m.f}g</div></div><div class="kc">${m.kcal} kcal</div><button class="ib del" data-act="delFood" data-id="${f.id}" aria-label="删除">${UI_IC.del}</button></div>`}}
+  else h+=`<div class="empty" style="padding:14px">还没记饮食，点下面添加</div>`;
+  h+=`<button class="btn" style="margin-top:8px" data-act="addFood">＋ 添加食物</button></div>`;
   const tips=[['🍗','#FF6B6B','每餐都有蛋白质','分 3–4 餐摄入，每餐约 '+Math.round(n.p.g/4)+'–'+Math.round(n.p.g/3)+' g'],
     ['🥦','#22B07D','多吃蔬菜','每天 300–500 g，增加饱腹感与膳食纤维'],
     ['💧','#4C8DF6','喝水约 '+(n.water/1000).toFixed(1)+' L','按 35 ml/kg 估算（'+n.water+' ml），训练日适当多喝'],
@@ -647,6 +786,112 @@ function render(){updateDot();({today:renderToday,diet:renderDiet,history:render
 /* ========== 记录面板（底部弹层）========== */
 function openSheet(html){const sh=$('#sheet');sh.innerHTML='<div class="grab"></div>'+html;sh.scrollTop=0;$('#mask').classList.add('on');sh.classList.add('on')}
 function closeSheet(){$('#mask').classList.remove('on');$('#sheet').classList.remove('on');draft=null;sheetMode=null}
+
+function makePlanObj(tplId, slot){
+  const tpl=PLANS[tplId]||PLANS.lean;
+  if(tplId==='custom') return {template:'custom',name:'自定义',parts:[],ex:[],tip:tpl.tip};
+  const sl=slot||tpl.cycle[0];
+  return {template:tplId,name:sl.name,parts:[...sl.parts],ex:sl.ex.map(x=>[...x]),tip:tpl.tip,slotId:sl.id};
+}
+function applyPlan(k, plan){
+  const d=getDay(k,true);d.plan=plan;save();
+}
+function genWeekPlan(){
+  const tpl=PLANS[S.planTemplate]||PLANS.lean;
+  if(tpl.id==='custom'){toast('自定义模板请点某一天手动选部位');return}
+  const start=new Date();start.setHours(0,0,0,0);
+  let n=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);
+    const slot=tpl.cycle[i%tpl.cycle.length];
+    applyPlan(dkey(d), makePlanObj(tpl.id, slot));
+    if(slot.parts.length)n++;
+  }
+  toast(`已生成 7 天计划（含 ${n} 个训练日）`);renderHistory();
+}
+function openPlanEditor(k){
+  sheetMode='plan';
+  const existing=getDay(k)&&getDay(k).plan;
+  const tplId=(existing&&existing.template)||S.planTemplate||'lean';
+  draft={k, template:tplId, parts:existing?existing.parts.slice():[], name:existing?existing.name:'', rest:existing?!((existing.parts||[]).length):false, slotId:existing&&existing.slotId};
+  if(tplId!=='custom'&&PLANS[tplId]&&PLANS[tplId].cycle&&!existing){
+    const sl=PLANS[tplId].cycle[0];draft.parts=[...sl.parts];draft.name=sl.name;draft.slotId=sl.id;
+  }
+  renderPlanEditor();
+}
+function renderPlanEditor(){
+  const d=draft, tpl=PLANS[d.template]||PLANS.custom, dt=pkey(d.k);
+  let h=`<div class="sh-h"><div class="ic" style="background:rgba(155,92,246,.14);color:#9B5CF6">${ico('custom')}</div><div><div class="t">安排训练</div><div class="s">${dt.getMonth()+1}月${dt.getDate()}日 · ${WD[dt.getDay()]}</div></div><button class="ib close" data-act="closeSheet">${UI_IC.close}</button></div>`;
+  h+=`<div class="field"><label>计划模板</label><div class="tpl">${Object.values(PLANS).map(t=>`<button class="${d.template===t.id?'on':''}" data-act="planTpl" data-id="${t.id}"><b>${t.name}</b><small>${t.desc}</small></button>`).join('')}</div></div>`;
+  if(d.template!=='custom'&&tpl.cycle){
+    h+=`<div class="field"><label>这一天练什么</label><div class="picks">${tpl.cycle.map((sl,i)=>`<button class="${d.slotId===sl.id&&d.name===sl.name?'on':''}" data-act="planSlot" data-i="${i}">${sl.name}</button>`).join('')}<button class="${d.rest?'on':''}" data-act="planRest">休息</button></div></div>`;
+  }else{
+    h+=`<div class="field"><label>选择部位（可多选）</label><div class="picks">${PARTS.map(p=>`<button class="${d.parts.includes(p.id)?'on':''}" style="${cv(p)}" data-act="planPart" data-id="${p.id}">${p.name}</button>`).join('')}<button class="${d.rest?'on':''}" data-act="planRest">休息日</button></div></div>`;
+  }
+  h+=`<div class="note">${esc(tpl.tip)}</div>`;
+  h+=`<button class="btn" style="margin-top:12px" data-act="savePlan">保存计划</button>`;
+  if(getDay(d.k)&&getDay(d.k).plan)h+=`<button class="btn danger" style="margin-top:8px" data-act="clearPlan">清除这天的计划</button>`;
+  openSheet(h);
+}
+function savePlanDraft(){
+  const d=draft;if(!d)return;
+  if(d.rest){applyPlan(d.k,{template:d.template,name:'休息',parts:[],ex:[],tip:(PLANS[d.template]||PLANS.custom).tip,slotId:'rest'});}
+  else{
+    let plan;
+    if(d.template!=='custom'&&PLANS[d.template]&&PLANS[d.template].cycle){
+      const sl=(PLANS[d.template].cycle.find(x=>x.id===d.slotId&&x.name===d.name))||PLANS[d.template].cycle.find(x=>x.id===d.slotId)||PLANS[d.template].cycle[0];
+      plan=makePlanObj(d.template,sl);
+    }else{
+      if(!d.parts.length){toast('请选择至少一个部位，或设为休息日');return}
+      plan={template:'custom',name:'自定义',parts:d.parts.slice(),ex:d.parts.map(pid=>{const list=EX[pid]||[];return [pid,list[0]?list[0][0]:PM[pid].name]}),tip:PLANS.custom.tip};
+    }
+    applyPlan(d.k,plan);
+  }
+  closeSheet();toast('计划已保存');renderHistory();if(d.k===todayKey()&&ui.tab==='today')renderToday();
+}
+
+function openFoodSheet(preset){
+  sheetMode='food';
+  if(preset){draft={name:preset.name,amount:preset.base,unit:preset.unit,baseId:preset.id,kcal:'',p:'',c:'',f:'',saveLib:false,auto:true};}
+  else draft={name:'',amount:100,unit:'g',baseId:'',kcal:'',p:'',c:'',f:'',saveLib:false,auto:false};
+  renderFoodSheet();
+}
+function renderFoodSheet(){
+  const d=draft;const live=d.auto&&d.baseId?(FM[d.baseId]||S.foodLib.find(x=>x.id===d.baseId)):null;
+  const m=live?scaleFood(live,d.amount):{kcal:num(d.kcal),p:num(d.p),c:num(d.c),f:num(d.f)};
+  let h=`<div class="sh-h"><div class="ic" style="background:rgba(255,138,61,.14);color:#FF8A3D">${ico('custom')}</div><div><div class="t">添加食物</div><div class="s">记入今日饮食</div></div><button class="ib close" data-act="closeSheet">${UI_IC.close}</button></div>`;
+  h+=`<div class="field"><label>常用食物</label><div class="fgrid" id="food-presets">${FOODS.map(f=>`<button data-act="pickFood" data-id="${f.id}" class="${d.baseId===f.id?'on':''}" style="${d.baseId===f.id?'box-shadow:0 0 0 2px var(--accent) inset':''}"><div class="nm">${f.name}</div><div class="mk">${f.base}${f.unit} · ${f.kcal}kcal</div></button>`).join('')}</div></div>`;
+  if(S.foodLib.length){h+=`<div class="field"><label>我的食物库</label><div class="fgrid">${S.foodLib.map(f=>`<button data-act="pickLibFood" data-id="${f.id}"><div class="nm">${esc(f.name)}</div><div class="mk">${f.base}${f.unit} · ${f.kcal}kcal</div></button>`).join('')}</div></div>`}
+  h+=`<div class="field"><label>名称</label><input class="inp" id="fd-name" maxlength="20" value="${esc(d.name)}" placeholder="例如：鸡胸肉"></div>
+    <div class="fl"><div class="lb">数量</div><div style="display:flex;gap:6px;align-items:center"><input class="inp" id="fd-amount" type="number" inputmode="decimal" min="0" step="1" style="width:90px" value="${d.amount}"><select class="inp" id="fd-unit" style="width:72px"><option value="g"${d.unit==='g'?' selected':''}>g</option><option value="份"${d.unit==='份'?' selected':''}>份</option><option value="ml"${d.unit==='ml'?' selected':''}>ml</option></select></div></div>`;
+  if(!d.auto){h+=`<div class="fl"><div class="lb">热量 kcal</div><input class="inp" id="fd-kcal" type="number" inputmode="decimal" style="width:110px" value="${d.kcal}" placeholder="可选"></div>
+    <div class="fl"><div class="lb">蛋白 / 碳水 / 脂肪 g</div><div style="display:flex;gap:6px"><input class="inp" id="fd-p" type="number" inputmode="decimal" style="width:64px" value="${d.p}" placeholder="P"><input class="inp" id="fd-c" type="number" inputmode="decimal" style="width:64px" value="${d.c}" placeholder="C"><input class="inp" id="fd-f" type="number" inputmode="decimal" style="width:64px" value="${d.f}" placeholder="F"></div></div>`}
+  else h+=`<div class="est"><span>估算营养<br><small>按 ${live?live.base+live.unit:'—'} 换算 · 约略值</small></span><span><b id="fd-est">${m.kcal}</b> kcal<br><small>P ${m.p} · C ${m.c} · F ${m.f}</small></span></div>`;
+  h+=`<label class="it" style="display:flex;align-items:center;gap:10px;padding:8px 0;border:0"><input type="checkbox" id="fd-save"${d.saveLib?' checked':''}> 保存到我的食物库，方便下次复用</label>`;
+  h+=`<button class="btn" data-act="saveFood">加入今日饮食</button>
+    <button class="btn ghost" style="margin-top:8px" data-act="foodManual">${d.auto?'改为手动填写营养':'改用常用食物换算'}</button>`;
+  openSheet(h);
+}
+function saveFoodDraft(){
+  const d=draft;if(!d)return;
+  const name=($('#fd-name').value||d.name||'').trim();if(!name)return toast('请填写食物名称');
+  const amount=num($('#fd-amount')?$('#fd-amount').value:d.amount);if(amount<=0)return toast('请填写数量');
+  const unit=$('#fd-unit')?$('#fd-unit').value:d.unit;
+  const saveLib=$('#fd-save')&&$('#fd-save').checked;
+  let item={id:uid(),name,amount,unit,ts:Date.now()};
+  if(d.auto&&d.baseId){item.baseId=d.baseId;const m=scaleFood(FM[d.baseId]||S.foodLib.find(x=>x.id===d.baseId)||{base:1,kcal:0,p:0,c:0,f:0},amount);item.kcal=m.kcal;item.p=m.p;item.c=m.c;item.f=m.f}
+  else{
+    item.kcal=num($('#fd-kcal')?$('#fd-kcal').value:d.kcal);item.p=num($('#fd-p')?$('#fd-p').value:d.p);item.c=num($('#fd-c')?$('#fd-c').value:d.c);item.f=num($('#fd-f')?$('#fd-f').value:d.f);
+    if(item.kcal<=0&&item.p<=0&&item.c<=0&&item.f<=0)return toast('请至少填写热量或营养素');
+  }
+  const day=getDay(todayKey(),true);day.foods.push(item);
+  if(saveLib){
+    const libItem={id:uid(),name,unit,base:amount,kcal:item.kcal,p:item.p,c:item.c,f:item.f};
+    if(!S.foodLib.some(x=>x.name===name&&x.unit===unit)) S.foodLib.push(libItem);
+  }
+  save();closeSheet();renderDiet();toast('已添加：'+name);
+}
+
 
 function openEditor(part,ex,entry){
   sheetMode='entry';
@@ -833,6 +1078,25 @@ document.addEventListener('click',ev=>{
     case 'addCal': addToCalendar();break;
     case 'askNotify': askNotify();break;
     case 'goal': S.profile.goal=el.dataset.g;save();renderDiet();toast('目标已切换为「'+GOALS.find(x=>x[0]===el.dataset.g)[1]+'」');break;
+    case 'pickTpl': S.planTemplate=el.dataset.id;save();renderHistory();toast('已选择模板：'+PLANS[el.dataset.id].name);break;
+    case 'genWeek': genWeekPlan();break;
+    case 'editPlan': openPlanEditor(el.dataset.k||ui.sel);break;
+    case 'planTpl':{
+      draft.template=el.dataset.id;draft.rest=false;
+      if(el.dataset.id!=='custom'&&PLANS[el.dataset.id].cycle){const sl=PLANS[el.dataset.id].cycle[0];draft.parts=[...sl.parts];draft.name=sl.name;draft.slotId=sl.id}
+      else{draft.parts=[];draft.name='自定义';draft.slotId=''}
+      renderPlanEditor();break;}
+    case 'planSlot':{const sl=PLANS[draft.template].cycle[+el.dataset.i];draft.rest=false;draft.parts=[...sl.parts];draft.name=sl.name;draft.slotId=sl.id;renderPlanEditor();break}
+    case 'planPart':{draft.rest=false;const id=el.dataset.id;const i=draft.parts.indexOf(id);if(i>=0)draft.parts.splice(i,1);else draft.parts.push(id);draft.name='自定义';renderPlanEditor();break}
+    case 'planRest': draft.rest=!draft.rest;if(draft.rest){draft.parts=[];draft.name='休息';draft.slotId='rest'}renderPlanEditor();break;
+    case 'savePlan': savePlanDraft();break;
+    case 'clearPlan':{const d=getDay(draft.k);if(d){d.plan=null;save()}closeSheet();toast('已清除计划');renderHistory();break}
+    case 'addFood': openFoodSheet();break;
+    case 'pickFood': openFoodSheet(FM[el.dataset.id]);break;
+    case 'pickLibFood':{const f=S.foodLib.find(x=>x.id===el.dataset.id);if(f){draft={name:f.name,amount:f.base,unit:f.unit,baseId:f.id,kcal:'',p:'',c:'',f:'',saveLib:false,auto:true};renderFoodSheet()}break}
+    case 'foodManual': draft.auto=!draft.auto;if(!draft.auto)draft.baseId='';renderFoodSheet();break;
+    case 'saveFood': saveFoodDraft();break;
+    case 'delFood':{const day=getDay(todayKey());if(!day)break;const f=day.foods.find(x=>x.id===el.dataset.id);if(f&&confirm(`删除「${f.name}」？`)){day.foods=day.foods.filter(x=>x!==f);save();renderDiet();toast('已删除')}break}
     case 'part':
       ui.part=ui.part===el.dataset.id?null:el.dataset.id;renderToday();
       if(ui.part){const s=$('#exSec');s&&s.scrollIntoView({behavior:'smooth',block:'nearest'})}break;
@@ -868,7 +1132,7 @@ document.addEventListener('click',ev=>{
     case 'export': exportData();break;
     case 'import': $('#importFile').value='';$('#importFile').click();break;
     case 'clear':
-      if(confirm('确定清空所有数据？此操作不可撤销！')&&confirm('再次确认：真的要清空吗？')){S=normalize({profile:S.profile});save();ui.part=null;render();toast('已清空')}
+      if(confirm('确定清空所有数据？此操作不可撤销！')&&confirm('再次确认：真的要清空吗？')){S=normalize({profile:S.profile,reminder:S.reminder});save();ui.part=null;render();toast('已清空')}
       break;
   }
 });
@@ -880,6 +1144,11 @@ document.addEventListener('input',ev=>{
   else if(t.id==='ed-min'){draft.minutes=t.value;updEst()}
   else if(t.id==='ed-km'){draft.km=t.value}
   else if(t.id==='ed-note'){draft.note=t.value}
+  if(sheetMode==='food'&&draft){
+    if(t.id==='fd-amount'){draft.amount=t.value;if(draft.auto){const live=FM[draft.baseId]||S.foodLib.find(x=>x.id===draft.baseId);const est=$('#fd-est');if(live&&est){const m=scaleFood(live,draft.amount);est.innerHTML=m.kcal+'</b> kcal<br><small>P '+m.p+' · C '+m.c+' · F '+m.f}}}
+    if(t.id==='fd-name')draft.name=t.value;
+    if(t.id==='fd-unit')draft.unit=t.value;
+  }
 });
 document.addEventListener('change',ev=>{
   const t=ev.target;
